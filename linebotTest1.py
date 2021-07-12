@@ -6,14 +6,20 @@ from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent,TextMessage,TextSendMessage
-
+from flask import render_template
 #其他後端function
 from StockSearch import Func_SearchStock
 from StockSearch import Func_PTTStock_TopN
 
+
 line_bot_api = LineBotApi('QcRH4+cmpgKeP24rDsHblYBgd0qkifKrgJem7GxmHyXCYLvOdZqsUkLFASyAYhjRAiFkeiY8AYd+aF2fW9Zn1FcUc9QBB4AK7AATm1MVc47orHkod3ZAm8hAOsGOLcoSy1XeyZuk+2fN8Afccu97EwdB04t89/1O/w1cDnyilFU=')
 handler = WebhookHandler('976067291be71b6c3e6a3d5c161db416')
 
+
+@app.route("/")
+def home():
+    return render_template("home.html")
+    
 # 接收到LINE發過來的資訊
 @app.route("/callback",methods=['POST'])
 def callback():
