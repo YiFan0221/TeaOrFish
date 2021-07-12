@@ -14,6 +14,8 @@
 
 from apscheduler.schedulers.blocking import BlockingScheduler
 import datetime
+import requests
+rs = requests.session()
 
 sched = BlockingScheduler()
 
@@ -33,7 +35,7 @@ def scheduled_job():
     print('========== APScheduler CRON =========')
     
     url = "https://teaorfish.herokuapp.com"
-    conn = urllib.request.urlopen(url)        
+    conn = rs.get(url)        
     for key, value in conn.getheaders():
         print(key, value)
         
