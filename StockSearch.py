@@ -58,7 +58,7 @@ def Func_PTTStock_TopN():
             index_list.append(index)
             time.sleep(1)
         else:
-            article_list = craw_page(res)
+            article_list.extend(craw_page(res))#往後加入列表
         time.sleep(0.05)
 
     total = len(article_list)
@@ -89,7 +89,7 @@ def craw_page(res):
                 title = r_ent.find(class_="title").text.strip()                
                 url = 'https://www.ptt.cc' + link
                 #print('3') 
-                #print(rate+title)
+                print(rate+title)
                 article_seq.append({
                     'title': title,
                     'url': url,

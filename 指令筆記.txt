@@ -1,5 +1,6 @@
 重要：
-0.及時指令台
+0.實時及時指令台
+$heroku login
 $heroku logs --tail
 
 1.須新增的檔案

@@ -30,43 +30,50 @@ def callback():
     except InvalidSignatureError:
         abort(400)
     return 'OK'
-@handler.add(MessageEvent,message=TextMessage)
 
-#鸚鵡
-#def handle_message(event):
-#    line_bot_api.reply_message(event.reply_token,
-#        TextSendMessage(text=event.message.text))
+
+@handler.add(MessageEvent,message=TextMessage)
 def handle_message(event):
     mtext=event.message.text
     if(type(mtext)==str):
         print('[***收到命令***]：'+mtext)
     if mtext=='股票':
         line_bot_api.reply_message(event.reply_token,TextSendMessage(text='接收到股票資訊'))
-    elif mtext=='TOP':
-        m_data =Func_PTTStock_TopN()        
-        st='TOP前10'+'\n'
-        print("Data len:"+str(len(m_data))) 
-
-        for i in range(0,13,1):
-            data=m_data.pop()
-            if i>=3:
-                st += str(i-2)+':['+data['rate']+'] '+data['title']+' '+data['url']+'\n'            
-        print(st)        
+    elif mtext=='TOP':        
+        st=Get_TOP_N_Report(10)
         line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))
+    elif mtext=='TOP20':        
+        st=Get_TOP_N_Report(20)
+        line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))    
     else:
-        m_data =Func_SearchStock(mtext)
-        if(type(m_data)== str):
-            line_bot_api.reply_message(event.reply_token,TextSendMessage(text=m_data))
-        else:
-            StockInfo = TextSendMessage( text =
-            '股票名稱:'+m_data.get('股票名稱')+' ('+m_data.get('股票編號')+')\n'+
-            '股票編號:'+m_data.get('股票現價')+'\n'+                         
-            '漲跌:'+m_data.get('漲跌')+' ('+m_data.get('漲跌幅')+')\n'     
-            '本益比:'+m_data.get('本益比')+'\n'+     
-            '本淨比:'+m_data.get('本淨比')     
-            )
-            line_bot_api.reply_message(event.reply_token,StockInfo)
-    
+        st =Get_SearchStock(mtext)        
+        line_bot_api.reply_message(event.reply_token,TextSendMessage( text = st ))
+        
+def Get_SearchStock(mtext):
+    m_data =Func_SearchStock(mtext)
+    if(type(m_data)== str):
+        rtn_text =m_data
+    else:
+        st=('股票名稱:'+m_data.get('股票名稱')+' ('+m_data.get('股票編號')+')\n'+
+        '股票編號:'+m_data.get('股票現價')+'\n'+                         
+        '漲跌:'+m_data.get('漲跌')+' ('+m_data.get('漲跌幅')+')\n'     
+        '本益比:'+m_data.get('本益比')+'\n'+     
+        '本淨比:'+m_data.get('本淨比'))
+        rtn_text=st    
+    return rtn_text  
+def Get_TOP_N_Report(num):
+    if(num>20 or num<=0):
+        return "超出上限(20筆)囉"
+    st='TOP前'+str(num)+'\n'        
+    m_data =Func_PTTStock_TopN()                
+    print("Data len:"+str(len(m_data))) 
+    for i in range(0,num+3,1):
+        data=m_data.pop()
+        #濾掉置頂文章,將列表加入列表
+        if i>=3:
+            st += str(i-2)+':['+data['rate']+'] '+data['title']+' '+data['url']+'\n'            
+    print(st)    
+    return st
        
 if __name__ == '__main__':
     app.run()
