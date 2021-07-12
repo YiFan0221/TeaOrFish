@@ -13,6 +13,7 @@
 #end_date	    整數或字串	latest possible date/time to trigger on (inclusive)
 
 from apscheduler.schedulers.blocking import BlockingScheduler
+import datetime
 
 sched = BlockingScheduler()
 
@@ -27,7 +28,8 @@ def scheduled_job():
     # 馬上讓我們瞧瞧
     print('This job runs every day */2 min.')
     # 利用datetime查詢時間
-    print(f'{datetime.datetime.now().ctime()}')
+    st = datetime.datetime.now().ctime()
+    print(st)
     print('========== APScheduler CRON =========')
     
     url = "https://teaorfish.herokuapp.com"

@@ -1,4 +1,6 @@
 重要：
+0.及時指令台
+$heroku logs --tail
 
 1.須新增的檔案
 [runtime.txt]		運作所需的python版本
