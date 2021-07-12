@@ -1,7 +1,7 @@
 from flask import Flask
 app = Flask(__name__)
 
-print("..........Flask start!")
+app.logger.info("..........Flask start!")
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
