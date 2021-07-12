@@ -32,13 +32,11 @@ def scheduled_job():
     # 利用datetime查詢時間
     st = datetime.datetime.now().ctime()
     print(st)
-    print('========== APScheduler CRON =========')
     
     url = "https://teaorfish.herokuapp.com"
     conn = rs.get(url)        
-    for key, value in conn.getheaders():
-        print(key, value)
-        
+    
+    print('========== APScheduler CRON =========')
 
 @sched.scheduled_job('cron', day_of_week='mon-fri', hour=17)
 def scheduled_job():
