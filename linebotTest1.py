@@ -55,7 +55,7 @@ def Get_SearchStock(mtext):
         rtn_text =m_data
     else:
         st=('股票名稱:'+m_data.get('股票名稱')+' ('+m_data.get('股票編號')+')\n'+
-        '股票編號:'+m_data.get('股票現價')+'\n'+                         
+        '股票現價:'+m_data.get('股票現價')+'\n'+                         
         '漲跌:'+m_data.get('漲跌')+' ('+m_data.get('漲跌幅')+')\n'     
         '本益比:'+m_data.get('本益比')+'\n'+     
         '本淨比:'+m_data.get('本淨比'))
