@@ -46,9 +46,11 @@ def handle_message(event):
         st=Get_TOP_N_Report(20)
         line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))    
     else:
-        st =Get_SearchStock(mtext)        
-        line_bot_api.reply_message(event.reply_token,TextSendMessage( text = st ))
+        if(mtext.isdigit()):
+            st =Get_SearchStock(mtext)        
+            line_bot_api.reply_message(event.reply_token,TextSendMessage( text = st ))
         
+            
 def Get_SearchStock(mtext):
     m_data =Func_SearchStock(mtext)
     if(type(m_data)== str):
