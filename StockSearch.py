@@ -169,3 +169,63 @@ def Func_SearchStock(num):
     print('離開函式:Func_SearchStock')   
     return m_data_dict
    
+   
+def Func_TopRate(TopNum,mode): #TopNum:int
+    print('進入函式:Func_TopRate 模式:'+mode)
+    #mode = "Trust"
+    #if(mode=="投信"):
+    #    link = "https://goodinfo.tw/StockInfo/StockList.asp?RPT_TIME=&MARKET_CAT=熱門排行&INDUSTRY_CAT=投信買超佔發行張數+–+5日%40%40投信買超佔發行張數%40%40投信+–+5日" 
+    #else if(mode=="外資")
+    #    link = "https://goodinfo.tw/StockInfo/StockList.asp?RPT_TIME=&MARKET_CAT=熱門排行&INDUSTRY_CAT=外資買超佔發行張數+–+5日%40%40外資買超佔發行張數%40%40外資+–+5日"
+    #else if(mode=="自營商")
+    #    link = "https://goodinfo.tw/StockInfo/StockList.asp?RPT_TIME=&MARKET_CAT=熱門排行&INDUSTRY_CAT=自營商買超佔發行張數+–+5日%40%40自營商買超佔發行張數%40%40自營商+–+5日"
+    link= "https://goodinfo.tw/StockInfo/StockList.asp?RPT_TIME=&MARKET_CAT=熱門排行&INDUSTRY_CAT="+mode+"買超佔發行張數+–+5日%40%40"+mode+"買超佔發行張數%40%40"+mode+"+–+5日"
+    print(link+'\n')
+    res_Page = rs.get(link,headers=header, timeout = 10,verify=True)  
+    res_Page.encoding = res_Page.apparent_encoding#根據網站轉換編碼
+
+    
+    #PS.例外資訊： socket.timeout: The read operation timed out                  
+    soup = BeautifulSoup(res_Page.text, 'html.parser')
+    #例外情形 返回無資料
+    #m_error = [tag.text for tag in soup.find_all("div", class_="jsx-3008000365")]
+    #if(soup.title.string== '404' or str(m_error)!='[]'):
+    #    rtn = '找不到相關資訊歐~'
+    #    print(rtn)
+    #    return rtn
+    
+    m_key=[]
+    m_Value=[]
+   
+    for num in range(0,TopNum, 1):
+        st_Row="row"+str(num)
+        RowInfo=soup.find(id=st_Row)
+        m_Info = [tag.text for tag in RowInfo.find_all("td")]                 
+        #建立字典
+        dInfo={
+                   '排行':str(m_Info[0]),
+                   '代號':str(m_Info[1]),
+                   '名稱':str(m_Info[2]),
+                   '成交':str(m_Info[3]), 
+                   '漲跌價':str(m_Info[4]), 
+                   '漲跌幅':str(m_Info[5]), 
+                   '更新日期':str(m_Info[6]), 
+                   '當日買賣超佔發行張數':str(m_Info[7]) ,
+                   '2日買賣超佔發行張數':str(m_Info[8]) ,
+                   '3日買賣超佔發行張數':str(m_Info[9]) ,
+                   '5日買賣超佔發行張數':str(m_Info[10])             
+        }       
+        #排行,代號,名稱,成交,五日連買比
+        rtn_st = dInfo["排行"]+'\t'+dInfo["名稱"]+"("+dInfo["代號"]+")\t"+dInfo["當日買賣超佔發行張數"]+"\t"+dInfo["2日買賣超佔發行張數"]+"\t"+ dInfo["當日買賣超佔發行張數"]+"\t"+dInfo["3日買賣超佔發行張數"]     
+        m_key.append(dInfo['排行'])
+        m_Value.append(rtn_st)
+  
+    
+    m_data_zip=[]
+    m_data_zip = zip(m_key,m_Value)
+    m_data_dict = dict(m_data_zip)
+    print("其他資訊:"+str(m_data_dict))
+    print('離開函式:ContinuousTrust 模式:'+mode)   
+    return m_data_dict   
+   
+ 

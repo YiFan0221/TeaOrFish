@@ -10,12 +10,15 @@ from flask import render_template
 #其他後端function
 from StockSearch import Func_SearchStock
 from StockSearch import Func_PTTStock_TopN
+from StockSearch import Func_TopRate
 
 
 line_bot_api = LineBotApi('QcRH4+cmpgKeP24rDsHblYBgd0qkifKrgJem7GxmHyXCYLvOdZqsUkLFASyAYhjRAiFkeiY8AYd+aF2fW9Zn1FcUc9QBB4AK7AATm1MVc47orHkod3ZAm8hAOsGOLcoSy1XeyZuk+2fN8Afccu97EwdB04t89/1O/w1cDnyilFU=')
 handler = WebhookHandler('976067291be71b6c3e6a3d5c161db416')
 
-
+#test Area
+#Func_TopRate(20)
+#test Area
 @app.route("/")
 def home():
     return render_template("home.html")
@@ -44,13 +47,34 @@ def handle_message(event):
         line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))
     elif mtext=='TOP20':        
         st=Get_TOP_N_Report(20)
-        line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))    
+        line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))
+    elif mtext=='外資比排行' or mtext=='FT':        
+        st=Get_TopRate("外資")
+        line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))
+    elif mtext=='投資比排行' or mtext=='TT':        
+        st=Get_TopRate("投信")
+        line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))
+    elif mtext=='自資比排行' or mtext=='ST':        
+        st=Get_TopRate("自營商")
+        line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))        
     else:
         if(mtext.isdigit()):
             st =Get_SearchStock(mtext)        
             line_bot_api.reply_message(event.reply_token,TextSendMessage( text = st ))
         
-            
+def Get_TopRate(mode):
+    num = 10
+    m_data =Func_TopRate(num,mode)
+    if(type(m_data)== str):
+        rtn_text =m_data    
+    else:
+        st=mode+'資本佔比五日排行\n排序\t名稱(代號)\t當日\t2日\t3日\t5日'+'\n'
+        for num in range(1,len(m_data), 1):
+            st = st+ m_data.get(str(num))+'\n'
+        rtn_text=st    
+    return rtn_text
+    
+    
 def Get_SearchStock(mtext):
     m_data =Func_SearchStock(mtext)
     if(type(m_data)== str):
