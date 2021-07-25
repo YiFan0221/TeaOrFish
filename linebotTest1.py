@@ -8,7 +8,8 @@ from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent,TextMessage,TextSendMessage
 from flask import render_template
 #其他後端function
-from StockSearch import Func_SearchStock
+from StockSearch import Func_SearchStock_wantgoo
+from StockSearch import Func_SearchStock_cnyes
 from StockSearch import Func_PTTStock_TopN
 from StockSearch import Func_TopRate
 
@@ -76,7 +77,7 @@ def Get_TopRate(mode):
     
     
 def Get_SearchStock(mtext):
-    m_data =Func_SearchStock(mtext)
+    m_data =Func_SearchStock_cnyes(mtext)
     if(type(m_data)== str):
         rtn_text =m_data
     else:

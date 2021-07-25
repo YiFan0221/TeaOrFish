@@ -103,9 +103,71 @@ def craw_page(res):
     return article_seq
     
 
-def Func_SearchStock(num):
+def Func_SearchStock_wantgoo(StockNum):
+    print('進入函式:Func_SearchStock_wantgoo') 
+    numstring = str(StockNum)
+    link = "https://www.wantgoo.com/index/"+numstring+"/" 
+    
+    print(link)
+    res_Page = rs.get(link,headers=header, timeout = 10,verify=False)  
+    #PS.例外資訊： socket.timeout: The read operation timed out                  
+    soup = BeautifulSoup(res_Page.text, 'html.parser')
+    if(soup.title.string== '404 - 此頁面不存在 | 玩股網'):
+        rtn = '找不到相關資訊歐~'
+        print(rtn)        
+        return rtn
+
+    print(soup)
+    m_key=[]
+    m_Value=[]
+    
+    m_ID = [tag.text for tag in soup.find_all("span", {"class": "astock-code ml-2"})]#股票編號    
+    m_key.append('股票編號')
+    m_Value.append(m_ID[0])
+    print("股票編號:"+str(m_ID[0]) )
+
+    m_Name = [tag.text for tag in soup.find_all("div", {"class": "astock-name"})]#名稱 #jsx-37573986 header_second 也可以
+    m_key.append('股票名稱')
+    m_Value.append(m_Name[0])
+    print("股票名稱:"+m_Name[0])     
+    
+    m_Price = [tag.text for tag in soup.find_all("div", {"class": "deal"})]#現價
+    m_key.append('股票現價')
+    m_Value.append(m_Price[0])
+    print("股票現價:"+str(m_Price[0]))       
+
+    m_UpDown = [tag.text for tag in soup.find_all("div", {"class": "chg ud-arrow"})]#漲跌
+    m_key.append('漲跌')
+    m_Value.append(m_UpDown[0])
+    print("漲跌:"+str(m_UpDown[0]))  
+    
+    m_UpDownPercent = [tag.text for tag in soup.find_all("div", {"class": "chg-rate ml-2"})]#漲跌幅
+    m_key.append('漲跌幅')
+    m_Value.append(m_UpDownPercent[0])
+    print("漲跌幅:"+str(m_UpDownPercent[0]))  
+            
+    for tag in soup.find_all("ul", {"class": "nav nav-detail-ohlc"}):
+        for unit in tag.find_all("li", {"class": "nav-item"}):
+            Name =unit.find('i')
+            print("Name:"+Name)
+            m_key.append(Name[0])
+            value =unit.find('span')
+            print("value:"+value)            
+            m_Value.append(value[0])        
+
+    #累了 轉換看這篇:
+    #https://blog.csdn.net/loner_fang/article/details/80940600    
+    m_data_zip=[]
+    m_data_zip = zip(m_key,m_Value)
+    m_data_dict = dict(m_data_zip)
+    print("其他資訊:"+str(m_data_dict))
+    print('離開函式:Func_SearchStock_wantgoo')   
+    return m_data_dict       
+               
+
+def Func_SearchStock_cnyes(StockNum):
     print('進入函式:Func_SearchStock') 
-    numstring = str(num)
+    numstring = str(StockNum)
     link = "https://invest.cnyes.com/twstock/TWS/"+numstring+"/" 
     res_Page = rs.get(link,headers=header, timeout = 10,verify=False)  
     #PS.例外資訊： socket.timeout: The read operation timed out                  
@@ -115,13 +177,8 @@ def Func_SearchStock(num):
     m_error = [tag.text for tag in soup.find_all("div", class_="jsx-3008000365")]
     if(soup.title.string== '404' or str(m_error)!='[]'):
         rtn = '找不到相關資訊歐~'
-        print(rtn)
+        print(rtn)        
         return rtn
-           
-    
-    #example
-    #m_Para = [tag.text for tag in soup.find_all("div", {"class": ""})]#
-    #print(":"+str(m_Para[0]))       
 
     m_key=[]
     m_Value=[]
@@ -181,7 +238,7 @@ def Func_TopRate(TopNum,mode): #TopNum:int
     #    link = "https://goodinfo.tw/StockInfo/StockList.asp?RPT_TIME=&MARKET_CAT=熱門排行&INDUSTRY_CAT=自營商買超佔發行張數+–+5日%40%40自營商買超佔發行張數%40%40自營商+–+5日"
     link= "https://goodinfo.tw/StockInfo/StockList.asp?RPT_TIME=&MARKET_CAT=熱門排行&INDUSTRY_CAT="+mode+"買超佔發行張數+–+5日%40%40"+mode+"買超佔發行張數%40%40"+mode+"+–+5日"
     print(link+'\n')
-    res_Page = rs.get(link,headers=header, timeout = 10,verify=True)  
+    res_Page = rs.get(link,headers=header, timeout = 15,verify=True)  
     res_Page.encoding = res_Page.apparent_encoding#根據網站轉換編碼
 
     
