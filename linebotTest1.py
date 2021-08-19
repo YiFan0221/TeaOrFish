@@ -5,14 +5,18 @@ print("..........Flask start!")
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
-from linebot.models import MessageEvent,TextMessage,TextSendMessage
+from linebot.models import * #MessageEvent,TextMessage,ImageSendMessage
 from flask import render_template
+import os
+import tempfile
+
 #其他後端function
 from StockSearch import Func_SearchStock_wantgoo
 from StockSearch import Func_SearchStock_cnyes
 from StockSearch import Func_PTTStock_TopN
 from StockSearch import Func_TopRate
-
+from TickerOrder import Func_thsrcOrder
+from picIV import Pic_Auth
 
 line_bot_api = LineBotApi('QcRH4+cmpgKeP24rDsHblYBgd0qkifKrgJem7GxmHyXCYLvOdZqsUkLFASyAYhjRAiFkeiY8AYd+aF2fW9Zn1FcUc9QBB4AK7AATm1MVc47orHkod3ZAm8hAOsGOLcoSy1XeyZuk+2fN8Afccu97EwdB04t89/1O/w1cDnyilFU=')
 handler = WebhookHandler('976067291be71b6c3e6a3d5c161db416')
@@ -36,32 +40,79 @@ def callback():
     return 'OK'
 
 
-@handler.add(MessageEvent,message=TextMessage)
+
+
+
+@handler.add(MessageEvent)
 def handle_message(event):
-    mtext=event.message.text
-    if(type(mtext)==str):
-        print('[***收到命令***]：'+mtext)
-    if mtext=='股票':
-        line_bot_api.reply_message(event.reply_token,TextSendMessage(text='接收到股票資訊'))
-    elif mtext=='TOP':        
-        st=Get_TOP_N_Report(10)
-        line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))
-    elif mtext=='TOP20':        
-        st=Get_TOP_N_Report(20)
-        line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))
-    elif mtext=='外資比排行' or mtext=='FT':        
-        st=Get_TopRate("外資")
-        line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))
-    elif mtext=='投資比排行' or mtext=='TT':        
-        st=Get_TopRate("投信")
-        line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))
-    elif mtext=='自資比排行' or mtext=='ST':        
-        st=Get_TopRate("自營商")
-        line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))        
-    else:
-        if(mtext.isdigit()):
-            st =Get_SearchStock(mtext)        
-            line_bot_api.reply_message(event.reply_token,TextSendMessage( text = st ))
+    print(event.message)
+    message_id=event.message.id
+    MsgType=event.message.type
+    
+    if(MsgType=="image"):
+        print('[Stepppppppppppppp]['+message_id+' ***收到圖片***]：')        
+        message_content = line_bot_api.get_message_content(message_id)
+        print('[Stepppppppppppppp]取得檔案') 
+        
+        img_st="null"
+        #本地路徑 本地絕對路徑
+        #file_path = os.path.abspath(os.path.dirname(__file__)) + "\\" +message_id+".jpg"      
+        #print('[Stepppppppppppppp]準備複製來源檔案:'+file_path)
+        #with open(file_path, 'wb') as fd:
+        #    for chunk in message_content.iter_content():
+        #        fd.write(chunk)
+        #img_st=Pic_Auth(file_path)        
+        #print('[Stepppppppppppppp]辨識完畢,刪除暫存') 
+        
+        #生成臨時文件 tempfile.NamedTemporaryFile
+        print('[Stepppppppppppppp]準備複製來源檔案:')
+        with tempfile.NamedTemporaryFile(suffix='.jpg',delete=False) as tf:
+            for chunk in message_content.iter_content():
+                tf.write(chunk)
+            file_path = tf.name                
+        img_st=Pic_Auth(file_path)        
+        print('[Stepppppppppppppp]辨識完畢,刪除暫存')     
+                                    
+        line_bot_api.reply_message(event.reply_token,TextSendMessage(text=img_st))  
+        
+    elif(MsgType=="text"):
+        mtext=event.message.text
+        print('['+message_id+' ***收到文字***]：')
+        
+        if mtext=='aa':
+            testresault_st=Func_thsrcOrder()        
+            image_message=ImageSendMessage(
+                original_content_url=testresault_st[0],
+                preview_image_url=testresault_st[0]
+            )        
+            line_bot_api.reply_message(event.reply_token,image_message)
+        elif mtext=='TOP':        
+            st=Get_TOP_N_Report(10)
+            line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))
+        elif mtext=='TOP20':        
+            st=Get_TOP_N_Report(20)
+            line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))
+        elif mtext=='外資比排行' or mtext=='FT':        
+            st=Get_TopRate("外資")
+            line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))
+        elif mtext=='投資比排行' or mtext=='TT':        
+            st=Get_TopRate("投信")
+            line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))
+        elif mtext=='自資比排行' or mtext=='ST':        
+            st=Get_TopRate("自營商")
+            line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))        
+        elif mtext=='0806449' or mtext=='9527':        
+            if mtext=='0806449':
+                st='崊盃喝尿簌簌叫'
+            elif mtext=='23965088':
+                st='先生要報統編嗎?'
+            line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))                    
+        else:
+            if(mtext.isdigit()):
+                st =Get_SearchStock(mtext)        
+                line_bot_api.reply_message(event.reply_token,TextSendMessage( text = st ))    
+        
+        
         
 def Get_TopRate(mode):
     num = 10
@@ -103,6 +154,6 @@ def Get_TOP_N_Report(num):
     return st
        
 if __name__ == '__main__':
-    app.run()
+    app.run(host="0.0.0.0", port=3000)
 
 

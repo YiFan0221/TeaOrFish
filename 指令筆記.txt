@@ -1,3 +1,6 @@
+Url:
+https://teaorfishsub.herokuapp.com/
+https://teaorfish.herokuapp.com/
 重要：
 0.實時及時指令台
 $heroku login
@@ -30,3 +33,11 @@ $heroku restart
 D:\alpaca_fighting>heroku config:add TZ="Asia/Taipei"
 Setting TZ and restarting ⬢ 你-APP-的名字... done, v23
 TZ: Asia/Taipei
+
+8.Linebot 訊息樣式設計網頁(圖形)
+https://developers.line.biz/flex-simulator/
+
+9.tesseract-ocr
+
+$ heroku run bash
+$ find -iname tessdata

@@ -24,16 +24,16 @@ sched = BlockingScheduler()
 #    print('定期呼叫.')
 
 
-@sched.scheduled_job('cron', day_of_week='mon-fri', minute='*/2')
+@sched.scheduled_job('cron', day_of_week='mon-fri', minute='*/20')
 def scheduled_job():
     print('========== APScheduler CRON =========')
     # 馬上讓我們瞧瞧
-    print('This job runs every day */2 min.')
+    print('This job runs every day */20 min.')
     # 利用datetime查詢時間
     st = datetime.datetime.now().ctime()
     print(st)
     
-    url = "https://teaorfish.herokuapp.com"
+    url = "https://teaorfishsub.herokuapp.com"
     conn = rs.get(url)        
     
     print('========== APScheduler CRON =========')

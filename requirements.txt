@@ -1,5 +1,8 @@
 Flask==2.0.1
 gunicorn
-line-bot-sdk==1.8.0
+line-bot-sdk==1.19.0
 beautifulsoup4==4.9.3
 APScheduler==3.6.1
+pillow==8.3.1
+pytesseract==0.3.8
+tesseract==0.1.3
