@@ -183,12 +183,12 @@ def Func_SearchStock_cnyes(StockNum):
     m_key=[]
     m_Value=[]
     
-    m_ID = [tag.text for tag in soup.find_all("div", class_="jsx-37573986 main_title")]#股票編號    
+    m_ID = [tag.text for tag in soup.find_all("div", class_="jsx-2736983712 main_title")]#股票編號    
     m_key.append('股票編號')
     m_Value.append(m_ID[0])
     print("股票編號:"+str(m_ID[0]) )
 
-    m_Name = [tag.text for tag in soup.find_all("div", {"class": "jsx-37573986 main_subTitle"})]#名稱 #jsx-37573986 header_second 也可以
+    m_Name = [tag.text for tag in soup.find_all("div", {"class": "jsx-2736983712 main_subTitle"})]#名稱 #jsx-37573986 header_second 也可以
     m_key.append('股票名稱')
     m_Value.append(m_Name[0])
     print("股票名稱:"+m_Name[0])     
