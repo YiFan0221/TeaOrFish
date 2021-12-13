@@ -1,5 +1,4 @@
 from flask import Flask
-from numpy.lib.function_base import _cov_dispatcher
 app = Flask(__name__)
 
 print("..........Flask start!")
