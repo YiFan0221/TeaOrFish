@@ -1,4 +1,5 @@
 from flask import Flask
+from numpy.lib.function_base import _cov_dispatcher
 app = Flask(__name__)
 
 print("..........Flask start!")
@@ -106,11 +107,11 @@ def handle_message(event):
                 st='崊盃喝尿簌簌叫'
             elif mtext=='23965088':
                 st='先生要報統編嗎?'
-            line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))                    
-        else:
-            if(mtext.isdigit()):
-                st =Get_SearchStock(mtext)        
-                line_bot_api.reply_message(event.reply_token,TextSendMessage( text = st ))    
+            line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))     
+        elif(mtext.isdigit() and len(mtext)>=4):
+            st =Get_SearchStock(mtext)        
+            line_bot_api.reply_message(event.reply_token,TextSendMessage( text = st ))                   
+            
         
         
         
