@@ -208,12 +208,12 @@ def Func_SearchStock_cnyes(StockNum):
     m_Value.append(m_UpDownPercent[0])
     print("漲跌幅:"+str(m_UpDownPercent[0]))  
             
-    for tag in soup.find_all("div", {"class": "jsx-2687283247 jsx-1763002358 data-block"}):
-        Name = [val.text for val in tag.find_all("div", {"class": "jsx-2687283247 jsx-1763002358 block-title"})]
+    for tag in soup.find_all("div", {"class": "jsx-3791301805 jsx-1763002358 data-block"}):
+        Name = [val.text for val in tag.find_all("div", {"class": "jsx-3791301805 jsx-1763002358 block-title"})]
         m_key.append(Name[0])         
-        value = [val.text for val in tag.find_all("div", {"class": "jsx-2687283247 jsx-1763002358 block-value block-value--"})]
+        value = [val.text for val in tag.find_all("div", {"class": "jsx-3791301805 jsx-1763002358 block-value block-value--"})]
         if str(value) == "[]":
-            value2 = [val.text for val in tag.find_all("div", {"class": "jsx-2687283247 jsx-1763002358 block-value block-value-- block-value--small"})]
+            value2 = [val.text for val in tag.find_all("div", {"class": "jsx-3791301805 jsx-1763002358 block-value block-value-- block-value--small"})]
             m_Value.append(value2[0])        
         else:
             m_Value.append(value[0])  
