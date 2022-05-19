@@ -11,7 +11,6 @@ import os
 import tempfile
 
 #其他後端function
-from StockSearch import Func_SearchStock_wantgoo
 from StockSearch import Func_SearchStock_cnyes
 from StockSearch import Func_PTTStock_TopN
 from StockSearch import Func_TopRate
@@ -38,10 +37,6 @@ def callback():
     except InvalidSignatureError:
         abort(400)
     return 'OK'
-
-
-
-
 
 @handler.add(MessageEvent)
 def handle_message(event):
@@ -112,8 +107,6 @@ def handle_message(event):
             line_bot_api.reply_message(event.reply_token,TextSendMessage( text = st ))                   
             
         
-        
-        
 def Get_TopRate(mode):
     num = 10
     m_data =Func_TopRate(num,mode)
@@ -154,6 +147,6 @@ def Get_TOP_N_Report(num):
     return st
        
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=3000)
+    app.run(host="0.0.0.0", port=4000 , threaded=True)
 
 

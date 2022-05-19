@@ -5,19 +5,14 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Flask",
+            "name": "Python: linebot-FLASK專案",
             "type": "python",
             "request": "launch",
-            "module": "flask",
-            "env": {
-                "FLASK_APP": "linebotTest1.py",
-                "FLASK_ENV": "development"
-            },
-            "args": [
-                "run",
-                "--no-debugger"
-            ],
-            "jinja": true
-        }
+            "program": "${workspaceFolder}/linebotTest1.py",            
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            //"args": [],
+        },
+
     ]
 }

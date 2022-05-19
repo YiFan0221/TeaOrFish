@@ -103,67 +103,6 @@ def craw_page(res):
     return article_seq
     
 
-def Func_SearchStock_wantgoo(StockNum):
-    print('進入函式:Func_SearchStock_wantgoo') 
-    numstring = str(StockNum)
-    link = "https://www.wantgoo.com/index/"+numstring+"/" 
-    
-    print(link)
-    res_Page = rs.get(link,headers=header, timeout = 10,verify=False)  
-    #PS.例外資訊： socket.timeout: The read operation timed out                  
-    soup = BeautifulSoup(res_Page.text, 'html.parser')
-    if(soup.title.string== '404 - 此頁面不存在 | 玩股網'):
-        rtn = '找不到相關資訊歐~'
-        print(rtn)        
-        return rtn
-
-    print(soup)
-    m_key=[]
-    m_Value=[]
-    
-    m_ID = [tag.text for tag in soup.find_all("span", {"class": "astock-code ml-2"})]#股票編號    
-    m_key.append('股票編號')
-    m_Value.append(m_ID[0])
-    print("股票編號:"+str(m_ID[0]) )
-
-    m_Name = [tag.text for tag in soup.find_all("div", {"class": "astock-name"})]#名稱 #jsx-37573986 header_second 也可以
-    m_key.append('股票名稱')
-    m_Value.append(m_Name[0])
-    print("股票名稱:"+m_Name[0])     
-    
-    m_Price = [tag.text for tag in soup.find_all("div", {"class": "deal"})]#現價
-    m_key.append('股票現價')
-    m_Value.append(m_Price[0])
-    print("股票現價:"+str(m_Price[0]))       
-
-    m_UpDown = [tag.text for tag in soup.find_all("div", {"class": "chg ud-arrow"})]#漲跌
-    m_key.append('漲跌')
-    m_Value.append(m_UpDown[0])
-    print("漲跌:"+str(m_UpDown[0]))  
-    
-    m_UpDownPercent = [tag.text for tag in soup.find_all("div", {"class": "chg-rate ml-2"})]#漲跌幅
-    m_key.append('漲跌幅')
-    m_Value.append(m_UpDownPercent[0])
-    print("漲跌幅:"+str(m_UpDownPercent[0]))  
-            
-    for tag in soup.find_all("ul", {"class": "nav nav-detail-ohlc"}):
-        for unit in tag.find_all("li", {"class": "nav-item"}):
-            Name =unit.find('i')
-            print("Name:"+Name)
-            m_key.append(Name[0])
-            value =unit.find('span')
-            print("value:"+value)            
-            m_Value.append(value[0])        
-
-    #累了 轉換看這篇:
-    #https://blog.csdn.net/loner_fang/article/details/80940600    
-    m_data_zip=[]
-    m_data_zip = zip(m_key,m_Value)
-    m_data_dict = dict(m_data_zip)
-    print("其他資訊:"+str(m_data_dict))
-    print('離開函式:Func_SearchStock_wantgoo')   
-    return m_data_dict       
-               
 
 def Func_SearchStock_cnyes(StockNum):
     print('進入函式:Func_SearchStock') 
@@ -183,27 +122,32 @@ def Func_SearchStock_cnyes(StockNum):
     m_key=[]
     m_Value=[]
     
-    m_ID = StockNum#股票編號    
+    #股票編號 
+    m_ID = StockNum   
     m_key.append('股票編號')
     m_Value.append(m_ID)
     print("股票編號:"+str(m_ID[0]) )
 
-    m_Name = [tag.text for tag in soup.find_all("div", {"class": "jsx-2715122309 main_subTitle"})]#名稱 #jsx-37573986 header_second 也可以
+    #名稱 #jsx-37573986 header_second 也可以
+    m_Name = [tag.text for tag in soup.find_all("div", {"class": "jsx-2715122309 main_subTitle"})]
     m_key.append('股票名稱')
     m_Value.append(m_Name[0])
     print("股票名稱:"+m_Name[0])     
     
-    m_Price = [tag.text for tag in soup.find_all("div", {"class": "2214436525 info-lp"})]#現價
+    #現價
+    m_Price = [tag.text for tag in soup.find_all("div", {"class": "jsx-2214436525 info-lp"})]
     m_key.append('股票現價')
     m_Value.append(m_Price[0])
     print("股票現價:"+str(m_Price[0]))       
 
-    m_UpDown = [tag.text for tag in soup.find_all("div", {"class": "jsx-2214436525 change-net"})]#漲跌
+    #漲跌
+    m_UpDown = [tag.text for tag in soup.find_all("div", {"class": "jsx-2214436525 change-net"})]
     m_key.append('漲跌')
     m_Value.append(m_UpDown[0])
     print("漲跌:"+str(m_UpDown[0]))  
     
-    m_UpDownPercent = [tag.text for tag in soup.find_all("div", {"class": "jsx-2214436525 change-percent"})]#漲跌幅
+    #漲跌幅
+    m_UpDownPercent = [tag.text for tag in soup.find_all("div", {"class": "jsx-2214436525 change-percent"})]
     m_key.append('漲跌幅')
     m_Value.append(m_UpDownPercent[0])
     print("漲跌幅:"+str(m_UpDownPercent[0]))  
@@ -217,7 +161,8 @@ def Func_SearchStock_cnyes(StockNum):
             m_Value.append(value2[0])        
         else:
             m_Value.append(value[0])  
-    #累了 轉換看這篇:
+    #轉換看這篇:
+    #https://blog.csdn.net/loner_fang/article/details/80940600    
     m_data_zip=[]
     m_data_zip = zip(m_key,m_Value)
     m_data_dict = dict(m_data_zip)
