@@ -188,37 +188,36 @@ def Func_SearchStock_cnyes(StockNum):
     m_Value.append(m_ID)
     print("股票編號:"+str(m_ID[0]) )
 
-    m_Name = [tag.text for tag in soup.find_all("div", {"class": "jsx-1215116842 main_subTitle"})]#名稱 #jsx-37573986 header_second 也可以
+    m_Name = [tag.text for tag in soup.find_all("div", {"class": "jsx-2715122309 main_subTitle"})]#名稱 #jsx-37573986 header_second 也可以
     m_key.append('股票名稱')
     m_Value.append(m_Name[0])
     print("股票名稱:"+m_Name[0])     
     
-    m_Price = [tag.text for tag in soup.find_all("div", {"class": "jsx-2941083017 info-lp"})]#現價
+    m_Price = [tag.text for tag in soup.find_all("div", {"class": "2214436525 info-lp"})]#現價
     m_key.append('股票現價')
     m_Value.append(m_Price[0])
     print("股票現價:"+str(m_Price[0]))       
 
-    m_UpDown = [tag.text for tag in soup.find_all("div", {"class": "jsx-2941083017 change-net"})]#漲跌
+    m_UpDown = [tag.text for tag in soup.find_all("div", {"class": "jsx-2214436525 change-net"})]#漲跌
     m_key.append('漲跌')
     m_Value.append(m_UpDown[0])
     print("漲跌:"+str(m_UpDown[0]))  
     
-    m_UpDownPercent = [tag.text for tag in soup.find_all("div", {"class": "jsx-2941083017 change-percent"})]#漲跌幅
+    m_UpDownPercent = [tag.text for tag in soup.find_all("div", {"class": "jsx-2214436525 change-percent"})]#漲跌幅
     m_key.append('漲跌幅')
     m_Value.append(m_UpDownPercent[0])
     print("漲跌幅:"+str(m_UpDownPercent[0]))  
             
-    for tag in soup.find_all("div", {"class": "jsx-3791301805 jsx-1763002358 data-block"}):
-        Name = [val.text for val in tag.find_all("div", {"class": "jsx-3791301805 jsx-1763002358 block-title"})]
+    for tag in soup.find_all("div", {"class": "jsx-3874884103 jsx-1763002358 data-block"}):
+        Name = [val.text for val in tag.find_all("div", {"class": "jsx-3874884103 jsx-1763002358 block-title"})]
         m_key.append(Name[0])         
-        value = [val.text for val in tag.find_all("div", {"class": "jsx-3791301805 jsx-1763002358 block-value block-value--"})]
+        value = [val.text for val in tag.find_all("div", {"class": "jsx-3874884103 jsx-1763002358 block-value block-value--"})]
         if str(value) == "[]":
-            value2 = [val.text for val in tag.find_all("div", {"class": "jsx-3791301805 jsx-1763002358 block-value block-value-- block-value--small"})]
+            value2 = [val.text for val in tag.find_all("div", {"class": "jsx-3874884103 jsx-1763002358 block-value block-value-- block-value--small"})]
             m_Value.append(value2[0])        
         else:
             m_Value.append(value[0])  
     #累了 轉換看這篇:
-    #https://blog.csdn.net/loner_fang/article/details/80940600    
     m_data_zip=[]
     m_data_zip = zip(m_key,m_Value)
     m_data_dict = dict(m_data_zip)
