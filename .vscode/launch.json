@@ -4,11 +4,12 @@
     // 如需詳細資訊，請瀏覽: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
         {
             "name": "Python: linebot-FLASK專案",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/linebotTest1.py",            
+            "program": "${workspaceFolder}/linebotTest1.py",                        
             "console": "integratedTerminal",
             "justMyCode": true,
             //"args": [],
