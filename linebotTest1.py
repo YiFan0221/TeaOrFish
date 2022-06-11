@@ -154,3 +154,5 @@ if __name__ == '__main__':
 #https://blog.miniasp.com/post/2019/02/25/Creating-Self-signed-Certificate-using-OpenSSL
 #取得授承認的SSL
 #https://certbot.eff.org/instructions?ws=other&os=ubuntufocal
+#如何在 VSCode 設定完整的 .NET Core 建置、發行與部署工作 看第四點
+#https://blog.miniasp.com/post/2019/01/22/Configure-Tasks-and-Launch-in-VSCode-for-NET-Core

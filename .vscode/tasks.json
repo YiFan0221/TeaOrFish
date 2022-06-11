@@ -1,0 +1,47 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Flask start",
+            "type": "shell",
+            "command": "python3",
+            "args": [
+                "linebotTest1.py"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}",
+            }
+        },
+        {
+            "label": "ngrok start",
+            "type": "shell",
+            "command": "./ngrok",
+            "args": [
+                "--authtoken",
+                "2AG4lGta8KqX4hQaN7pTv2KLYSA_648NnfKiBoZad9nWNpgUV"
+                "http",
+                "4000",
+                "--host-header=localhost:4000",
+                "--region",
+                "ap"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/",
+            }
+        },
+        {
+            "label": "Build",
+            "dependsOn": [
+                "Flask start",
+                "ngrok start"
+            ],
+            "problemMatcher": [],//關閉掃描工作輸出
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}

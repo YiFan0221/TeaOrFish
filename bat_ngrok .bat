@@ -1,1 +1,1 @@
-ngrok http 4000 -host-header="localhost:4000" -region ap
+ngrok http 4000 --host-header="localhost:4000" --region ap
