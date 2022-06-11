@@ -20,7 +20,7 @@
             "command": "./ngrok",
             "args": [
                 "--authtoken",
-                "2AG4lGta8KqX4hQaN7pTv2KLYSA_648NnfKiBoZad9nWNpgUV"
+                "2AG4lGta8KqX4hQaN7pTv2KLYSA_648NnfKiBoZad9nWNpgUV",
                 "http",
                 "4000",
                 "--host-header=localhost:4000",
