@@ -5,15 +5,21 @@ from linebot.exceptions import InvalidSignatureError
 from linebot.models import * #MessageEvent,TextMessage,ImageSendMessage
 import os
 import tempfile
+from controller import Modbus_controller ,SSH_controller        ,Stock_controller      ,TickerOrder_controller
+
+
+
+
 from flasgger import Swagger
 
-#其他後端function
-from StockSearch import Func_SearchStock_cnyes
-from StockSearch import Func_PTTStock_TopN
-from StockSearch import Func_TopRate
-from TickerOrder import Func_thsrcOrder
-from picIV import Pic_Auth
 
+#其他後端function
+from StockSearch  import Func_SearchStock_cnyes ,Func_PTTStock_TopN ,Func_TopRate
+from TickerOrder  import Func_thsrcOrder
+from picIV        import Pic_Auth
+
+line_bot_api = LineBotApi('QcRH4+cmpgKeP24rDsHblYBgd0qkifKrgJem7GxmHyXCYLvOdZqsUkLFASyAYhjRAiFkeiY8AYd+aF2fW9Zn1FcUc9QBB4AK7AATm1MVc47orHkod3ZAm8hAOsGOLcoSy1XeyZuk+2fN8Afccu97EwdB04t89/1O/w1cDnyilFU=')
+handler = WebhookHandler('976067291be71b6c3e6a3d5c161db416')
 
 app = Flask(__name__)
 app.config['SWAGGER'] = {
@@ -25,19 +31,22 @@ app.config['SWAGGER'] = {
 }
 CORS(app)
 Swagger(app)
+
+#registering blueprints
+#註冊其他藍圖中的controllers
+app.register_blueprint(Modbus_controller       , url_prefix='/fe')
+app.register_blueprint(SSH_controller          , url_prefix='/camera')
+app.register_blueprint(Stock_controller        , url_prefix='/fe')
+app.register_blueprint(TickerOrder_controller  , url_prefix='/camera')
+                            
+
 print("..........Flask start!")
 
-line_bot_api = LineBotApi('QcRH4+cmpgKeP24rDsHblYBgd0qkifKrgJem7GxmHyXCYLvOdZqsUkLFASyAYhjRAiFkeiY8AYd+aF2fW9Zn1FcUc9QBB4AK7AATm1MVc47orHkod3ZAm8hAOsGOLcoSy1XeyZuk+2fN8Afccu97EwdB04t89/1O/w1cDnyilFU=')
-handler = WebhookHandler('976067291be71b6c3e6a3d5c161db416')
 
-#test Area
-#Func_TopRate(20)
-#test Area
 @app.route("/")
 def home():
   return render_template("home.html")
-    
-# 接收到LINE發過來的資訊
+
 @app.route("/callback",methods=['POST'])
 def callback():
   """
@@ -66,6 +75,7 @@ def callback():
   except InvalidSignatureError:
       abort(400)
   return 'OK'
+
 
 @handler.add(MessageEvent)
 def handle_message(event):
@@ -148,8 +158,27 @@ def Get_TopRate(mode):
       rtn_text=st    
   return rtn_text
     
-    
+@app.route("/SearchStock",methods=['GET'])
 def Get_SearchStock(mtext):
+  """
+    搜尋對應的股票資訊(爬蟲)
+    ---
+    tags:
+      - Stock
+    description:
+      搜尋股票資訊(爬蟲版)
+    produces: application/json,
+    parameters:
+    - name: name
+      in: path
+      required: true
+      type: string    
+    responses:
+      400:
+        description: InvalidSignatureError
+      200:
+        description: Receive Line request.
+  """
   m_data =Func_SearchStock_cnyes(mtext)
   if(type(m_data)== str):
       rtn_text =m_data
