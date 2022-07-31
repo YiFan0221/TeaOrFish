@@ -79,6 +79,23 @@ def callback():
       abort(400)
   return 'OK'
 
+def SwitchSettingMode():
+  global Mode
+  if(Mode == 'setting'):
+    Mode = 'normal'
+  else :
+    Mode = 'setting'
+  return 
+def CheckSettingMode():
+  global Mode
+  if(Mode == 'setting'):
+   return True
+  else :
+    return False
+def ShowMode():
+  global Mode
+  return '現在模式為: '+Mode
+          
 
 @handler.add(MessageEvent)
 def handle_message(event):
@@ -115,15 +132,11 @@ def handle_message(event):
   elif(MsgType=="text"):
       mtext=event.message.text
       print('['+message_id+' ***收到文字***]：')
-
+      
       #先檢查是不是設定模式
       if mtext=='switch':
-          global Mode
-          if(Mode == 'setting'):
-            Mode = 'normal'
-          else :
-            Mode = 'setting'
-          st = '現在模式為: '+Mode
+          SwitchSettingMode()          
+          st = ShowMode()
           line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))     
       else: #功能
         if mtext=='aa':
