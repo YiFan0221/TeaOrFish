@@ -138,7 +138,10 @@ def handle_message(event):
       if mtext=='switch':                
           StateSt =''
           StateSt += ShowMode()
+          StateSt += '\n'
           StateSt += SwitchSettingMode()
+          StateSt += '\n'
+          StateSt += ShowMode()
           line_bot_api.reply_message(event.reply_token,TextSendMessage(text=StateSt))     
       if mtext=='switcM':
           st = SwitchSettingMode()
