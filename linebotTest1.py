@@ -143,7 +143,7 @@ def handle_message(event):
           StateSt += '\n'
           StateSt += ShowMode()
           line_bot_api.reply_message(event.reply_token,TextSendMessage(text=StateSt))     
-      if mtext=='switcM':
+      elif mtext=='switcM':
           StateSt =''
           StateSt += ShowMode()
           line_bot_api.reply_message(event.reply_token,TextSendMessage(text=StateSt))     
