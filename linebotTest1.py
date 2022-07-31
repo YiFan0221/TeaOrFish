@@ -85,11 +85,12 @@ def SwitchSettingMode():
     Mode = 'normal'
   else :
     Mode = 'setting'
-  return 
+  return ShowMode()
+    
 def CheckSettingMode():
   global Mode
   if(Mode == 'setting'):
-   return True
+    return True
   else :
     return False
 def ShowMode():
@@ -134,9 +135,8 @@ def handle_message(event):
       print('['+message_id+' ***收到文字***]：')
       
       #先檢查是不是設定模式
-      if mtext=='switch':
-          SwitchSettingMode()          
-          st = ShowMode()
+      if mtext=='switch':                
+          st = SwitchSettingMode()
           line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))     
       else: #功能
         if mtext=='aa':
