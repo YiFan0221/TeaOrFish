@@ -85,7 +85,7 @@ def SwitchSettingMode():
     Mode = 'normal'
   else :
     Mode = 'setting'
-  return ShowMode()
+  return '更換為'+Mode
     
 def CheckSettingMode():
   global Mode
@@ -136,6 +136,11 @@ def handle_message(event):
       
       #先檢查是不是設定模式
       if mtext=='switch':                
+          StateSt =''
+          StateSt += ShowMode()
+          StateSt += SwitchSettingMode()
+          line_bot_api.reply_message(event.reply_token,TextSendMessage(text=StateSt))     
+      if mtext=='switcM':
           st = SwitchSettingMode()
           line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))     
       else: #功能
