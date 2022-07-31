@@ -144,8 +144,9 @@ def handle_message(event):
           StateSt += ShowMode()
           line_bot_api.reply_message(event.reply_token,TextSendMessage(text=StateSt))     
       if mtext=='switcM':
-          st = SwitchSettingMode()
-          line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))     
+          StateSt =''
+          StateSt += ShowMode()
+          line_bot_api.reply_message(event.reply_token,TextSendMessage(text=StateSt))     
       else: #功能
         if mtext=='aa':
             testresault_st=Func_thsrcOrder()        
