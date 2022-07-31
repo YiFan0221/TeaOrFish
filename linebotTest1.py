@@ -21,7 +21,7 @@ from picIV        import Pic_Auth
 line_bot_api = LineBotApi('QcRH4+cmpgKeP24rDsHblYBgd0qkifKrgJem7GxmHyXCYLvOdZqsUkLFASyAYhjRAiFkeiY8AYd+aF2fW9Zn1FcUc9QBB4AK7AATm1MVc47orHkod3ZAm8hAOsGOLcoSy1XeyZuk+2fN8Afccu97EwdB04t89/1O/w1cDnyilFU=')
 handler = WebhookHandler('976067291be71b6c3e6a3d5c161db416')
 
-global Mode 
+ 
 Mode = 'setting'
 
 app = Flask(__name__)
@@ -118,6 +118,7 @@ def handle_message(event):
 
       #先檢查是不是設定模式
       if mtext=='switch':
+          global Mode
           if(Mode == 'setting'):
             Mode = 'normal'
           else :
