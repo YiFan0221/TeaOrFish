@@ -21,6 +21,9 @@ from picIV        import Pic_Auth
 line_bot_api = LineBotApi('QcRH4+cmpgKeP24rDsHblYBgd0qkifKrgJem7GxmHyXCYLvOdZqsUkLFASyAYhjRAiFkeiY8AYd+aF2fW9Zn1FcUc9QBB4AK7AATm1MVc47orHkod3ZAm8hAOsGOLcoSy1XeyZuk+2fN8Afccu97EwdB04t89/1O/w1cDnyilFU=')
 handler = WebhookHandler('976067291be71b6c3e6a3d5c161db416')
 
+global Mode 
+Mode = 'setting'
+
 app = Flask(__name__)
 app.config['SWAGGER'] = {
     "title": "TeaOrFish",
@@ -34,10 +37,10 @@ Swagger(app)
 
 #registering blueprints
 #註冊其他藍圖中的controllers
-app.register_blueprint(Modbus_controller       , url_prefix='/fe')
-app.register_blueprint(SSH_controller          , url_prefix='/camera')
-app.register_blueprint(Stock_controller        , url_prefix='/fe')
-app.register_blueprint(TickerOrder_controller  , url_prefix='/camera')
+app.register_blueprint(Modbus_controller       , url_prefix='/MODBUS')
+app.register_blueprint(SSH_controller          , url_prefix='/SSH')
+app.register_blueprint(Stock_controller        , url_prefix='/STOCK')
+app.register_blueprint(TickerOrder_controller  , url_prefix='/Ticker')
                             
 
 print("..........Flask start!")
@@ -112,38 +115,48 @@ def handle_message(event):
   elif(MsgType=="text"):
       mtext=event.message.text
       print('['+message_id+' ***收到文字***]：')
-      
-      if mtext=='aa':
-          testresault_st=Func_thsrcOrder()        
-          image_message=ImageSendMessage(
-              original_content_url=testresault_st[0],
-              preview_image_url=testresault_st[0]
-          )        
-          line_bot_api.reply_message(event.reply_token,image_message)
-      elif mtext=='TOP':        
-          st=Get_TOP_N_Report(10)
-          line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))
-      elif mtext=='TOP20':        
-          st=Get_TOP_N_Report(20)
-          line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))
-      elif mtext=='外資比排行' or mtext=='FT':        
-          st=Get_TopRate("外資")
-          line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))
-      elif mtext=='投資比排行' or mtext=='TT':        
-          st=Get_TopRate("投信")
-          line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))
-      elif mtext=='自資比排行' or mtext=='ST':        
-          st=Get_TopRate("自營商")
-          line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))        
-      elif mtext=='0806449' or mtext=='9527':        
-          if mtext=='0806449':
-              st='崊盃喝尿簌簌叫'
-          elif mtext=='23965088':
-              st='先生要報統編嗎?'
+
+      #先檢查是不是設定模式
+      if mtext=='switch':
+          if(Mode == 'setting'):
+            Mode = 'normal'
+          else :
+            Mode = 'setting'
+          st = '現在模式為: '+Mode
           line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))     
-      elif(mtext.isdigit() and len(mtext)>=4):
-          st =Get_SearchStock(mtext)        
-          line_bot_api.reply_message(event.reply_token,TextSendMessage( text = st ))                   
+      else: #功能
+        if mtext=='aa':
+            testresault_st=Func_thsrcOrder()        
+            image_message=ImageSendMessage(
+                original_content_url=testresault_st[0],
+                preview_image_url=testresault_st[0]
+            )        
+            line_bot_api.reply_message(event.reply_token,image_message)
+        elif mtext=='TOP':        
+            st=Get_TOP_N_Report(10)
+            line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))
+        elif mtext=='TOP20':        
+            st=Get_TOP_N_Report(20)
+            line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))
+        elif mtext=='外資比排行' or mtext=='FT':        
+            st=Get_TopRate("外資")
+            line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))
+        elif mtext=='投資比排行' or mtext=='TT':        
+            st=Get_TopRate("投信")
+            line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))
+        elif mtext=='自資比排行' or mtext=='ST':        
+            st=Get_TopRate("自營商")
+            line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))        
+        elif mtext=='0806449' or mtext=='9527':        
+            if mtext=='0806449':
+                st='崊盃喝尿簌簌叫'
+            elif mtext=='23965088':
+                st='先生要報統編嗎?'
+            line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))     
+        elif(mtext.isdigit() and len(mtext)>=4):
+            st =Get_SearchStock(mtext)        
+            line_bot_api.reply_message(event.reply_token,TextSendMessage( text = st ))     
+
           
         
 def Get_TopRate(mode):
