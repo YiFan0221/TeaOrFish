@@ -18,6 +18,9 @@ header = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/5
 #headers = {"user-agent": "Mozilla/5.0 (Windows NT 6.1) "
 #"AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36"}
 
+def Func_Echo(mtext):
+    return mtext
+
 def Get_TopRate(mode):
     num = 10
     m_data =Func_TopRate(num,mode)

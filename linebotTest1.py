@@ -1,21 +1,21 @@
-from flask import Flask, request, abort ,render_template
+from flask import Flask, request, render_template ,abort
 from flask_cors import CORS
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import * #MessageEvent,TextMessage,ImageSendMessage
-import os
+
 import tempfile
 from controller import stock_controller, modbus_controller,ssh_controller,tickerOrder_controller
 
 from flasgger import Swagger
-
+from requests import *
 
 #其他後端function
 from backend_models.stocksearch import *
 from backend_models.picIV       import Pic_Auth
 from controller.stock           import *
 from controller.tickerOrder     import *
-
+from app_utils.app_result       import requests_api
 
 line_bot_api = LineBotApi('QcRH4+cmpgKeP24rDsHblYBgd0qkifKrgJem7GxmHyXCYLvOdZqsUkLFASyAYhjRAiFkeiY8AYd+aF2fW9Zn1FcUc9QBB4AK7AATm1MVc47orHkod3ZAm8hAOsGOLcoSy1XeyZuk+2fN8Afccu97EwdB04t89/1O/w1cDnyilFU=')
 handler = WebhookHandler('976067291be71b6c3e6a3d5c161db416')
@@ -78,23 +78,7 @@ def callback():
       abort(400)
   return 'OK'
 
-def SwitchSettingMode():
-  global Mode
-  if(Mode == 'setting'):
-    Mode = 'normal'
-  else :
-    Mode = 'setting'
-  return '更換為'+Mode
-    
-def CheckSettingMode():
-  global Mode
-  if(Mode == 'setting'):
-    return True
-  else :
-    return False
-def ShowMode():
-  global Mode
-  return '現在模式為: '+Mode
+
           
 
 @handler.add(MessageEvent)
@@ -146,6 +130,10 @@ def handle_message(event):
           StateSt =''
           StateSt += ShowMode()
           line_bot_api.reply_message(event.reply_token,TextSendMessage(text=StateSt))     
+      elif mtext[0:9]=='testSpace':
+          #這邊要呼叫家裡Server的API
+          StateSt = requests_api(mtext)                    
+          line_bot_api.reply_message(event.reply_token,TextSendMessage(text=StateSt.text))     
       else: #功能
         if mtext=='aa':
             testresault_st=Func_thsrcOrder()        
@@ -178,6 +166,24 @@ def handle_message(event):
         elif(mtext.isdigit() and len(mtext)>=4):
             st =Get_SearchStock(mtext)        
             line_bot_api.reply_message(event.reply_token,TextSendMessage( text = st ))     
+            
+def SwitchSettingMode():
+  global Mode
+  if(Mode == 'setting'):
+    Mode = 'normal'
+  else :
+    Mode = 'setting'
+  return '更換為'+Mode
+    
+def CheckSettingMode():
+  global Mode
+  if(Mode == 'setting'):
+    return True
+  else :
+    return False
+def ShowMode():
+  global Mode
+  return '現在模式為: '+Mode
 
       
 if __name__ == '__main__':

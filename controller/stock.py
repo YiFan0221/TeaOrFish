@@ -4,7 +4,7 @@ from flask import app, request
 from flask.wrappers import Response
 import json , logging , string
 from backend_models.stocksearch import *
-
+from app_utils.app_result import result_json
 #-------------共用函式-------------
 from enum import Enum, unique
 @unique
@@ -52,7 +52,6 @@ def FuncEventExecSDK(EventSDKAPI,*args):
         return EventSDKAPI() 
     else:#有帶參數值時將參數帶入函式執行
         return EventSDKAPI(*args)
-
     
 #-------------共用函式-------------
 
@@ -79,6 +78,23 @@ def FuncEventExecSDK(EventSDKAPI,*args):
 #     else:
 #       return result_json(400, returnStr_400)
 
+
+
+    
+@controller.route('/Echo', methods=["POST"])
+def set_Echo():  
+    eventName:str    = 'text'  
+    eventSDKAPI:function =Func_Echo
+    expectType:type      = string#int or bool
+    returnStr            = ""
+    returnStr_200        = "Success"
+    returnStr_400        = "Please check paras or query valid."
+    FuncEventLog(eventName,request.method)
+    status=FuncGetFormValue(expectType,eventName)
+    returnStr = FuncEventExecSDK(eventSDKAPI,status)
+    return result_json(200, returnStr)
+
+    
 
 @controller.route("/SearchStock",methods=['GET'])
 def Get_SearchStock(mtext):
@@ -112,3 +128,4 @@ def Get_SearchStock(mtext):
       '本淨比:'+m_data.get('本淨比'))
       rtn_text=st    
   return rtn_text  
+
