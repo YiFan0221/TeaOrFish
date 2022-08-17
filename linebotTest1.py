@@ -14,7 +14,7 @@ from flasgger import Swagger
 from backend_models.stocksearch import *
 from backend_models.picIV       import Pic_Auth
 from controller.stock           import *
-from controller.TickerOrder     import *
+from controller.tickerOrder     import *
 
 
 line_bot_api = LineBotApi('QcRH4+cmpgKeP24rDsHblYBgd0qkifKrgJem7GxmHyXCYLvOdZqsUkLFASyAYhjRAiFkeiY8AYd+aF2fW9Zn1FcUc9QBB4AK7AATm1MVc47orHkod3ZAm8hAOsGOLcoSy1XeyZuk+2fN8Afccu97EwdB04t89/1O/w1cDnyilFU=')
