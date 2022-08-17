@@ -36,9 +36,9 @@ Swagger(app)
 
 #registering blueprints
 #註冊其他藍圖中的controllers
-app.register_blueprint(modbus_controller       , url_prefix='/MODBUS')
+app.register_blueprint(modbus_controller       , url_prefix='/Modbus')
 app.register_blueprint(ssh_controller          , url_prefix='/SSH')
-app.register_blueprint(stock_controller        , url_prefix='/STOCK')
+app.register_blueprint(stock_controller        , url_prefix='/Stock')
 app.register_blueprint(tickerOrder_controller  , url_prefix='/Ticker')
                             
 
@@ -187,7 +187,7 @@ def ShowMode():
 
       
 if __name__ == '__main__':
-  #app.run(ssl_context=('server.crt', 'server.key'),host="0.0.0.0", port=4000 , threaded=True)
+  #app.run(ssl_context=('YiFanServer.crt', 'YiFanServer.key'),host="0.0.0.0", port=4000 , threaded=True)
   app.run(host="0.0.0.0", port=4000 , threaded=True)
 #添加SSL
 #https://medium.com/@charming_rust_oyster_221/flask-%E9%85%8D%E7%BD%AE-https-%E7%B6%B2%E7%AB%99-ssl-%E5%AE%89%E5%85%A8%E8%AA%8D%E8%AD%89-36dfeb609fa8
