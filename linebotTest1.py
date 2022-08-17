@@ -5,18 +5,17 @@ from linebot.exceptions import InvalidSignatureError
 from linebot.models import * #MessageEvent,TextMessage,ImageSendMessage
 import os
 import tempfile
-from controller import Modbus_controller ,SSH_controller        ,Stock_controller      ,TickerOrder_controller
-
-
-
+from controller import stock_controller, modbus_controller,ssh_controller,tickerOrder_controller
 
 from flasgger import Swagger
 
 
 #其他後端function
-from StockSearch  import Func_SearchStock_cnyes ,Func_PTTStock_TopN ,Func_TopRate
-from TickerOrder  import Func_thsrcOrder
-from picIV        import Pic_Auth
+from backend_models.stocksearch import *
+from backend_models.picIV       import Pic_Auth
+from controller.stock           import *
+from controller.TickerOrder     import *
+
 
 line_bot_api = LineBotApi('QcRH4+cmpgKeP24rDsHblYBgd0qkifKrgJem7GxmHyXCYLvOdZqsUkLFASyAYhjRAiFkeiY8AYd+aF2fW9Zn1FcUc9QBB4AK7AATm1MVc47orHkod3ZAm8hAOsGOLcoSy1XeyZuk+2fN8Afccu97EwdB04t89/1O/w1cDnyilFU=')
 handler = WebhookHandler('976067291be71b6c3e6a3d5c161db416')
@@ -37,10 +36,10 @@ Swagger(app)
 
 #registering blueprints
 #註冊其他藍圖中的controllers
-app.register_blueprint(Modbus_controller       , url_prefix='/MODBUS')
-app.register_blueprint(SSH_controller          , url_prefix='/SSH')
-app.register_blueprint(Stock_controller        , url_prefix='/STOCK')
-app.register_blueprint(TickerOrder_controller  , url_prefix='/Ticker')
+app.register_blueprint(modbus_controller       , url_prefix='/MODBUS')
+app.register_blueprint(ssh_controller          , url_prefix='/SSH')
+app.register_blueprint(stock_controller        , url_prefix='/STOCK')
+app.register_blueprint(tickerOrder_controller  , url_prefix='/Ticker')
                             
 
 print("..........Flask start!")
@@ -180,66 +179,7 @@ def handle_message(event):
             st =Get_SearchStock(mtext)        
             line_bot_api.reply_message(event.reply_token,TextSendMessage( text = st ))     
 
-          
-        
-def Get_TopRate(mode):
-  num = 10
-  m_data =Func_TopRate(num,mode)
-  if(type(m_data)== str):
-      rtn_text =m_data    
-  else:
-      st=mode+'資本佔比五日排行\n排序\t名稱(代號)\t當日\t2日\t3日\t5日'+'\n'
-      for num in range(1,len(m_data), 1):
-          st = st+ m_data.get(str(num))+'\n'
-      rtn_text=st    
-  return rtn_text
-    
-@app.route("/SearchStock",methods=['GET'])
-def Get_SearchStock(mtext):
-  """
-    搜尋對應的股票資訊(爬蟲)
-    ---
-    tags:
-      - Stock
-    description:
-      搜尋股票資訊(爬蟲版)
-    produces: application/json,
-    parameters:
-    - name: name
-      in: path
-      required: true
-      type: string    
-    responses:
-      400:
-        description: InvalidSignatureError
-      200:
-        description: Receive Line request.
-  """
-  m_data =Func_SearchStock_cnyes(mtext)
-  if(type(m_data)== str):
-      rtn_text =m_data
-  else:
-      st=('股票名稱:'+m_data.get('股票名稱')+' ('+m_data.get('股票編號')+')\n'+
-      '股票現價:'+m_data.get('股票現價')+'\n'+                         
-      '漲跌:'+m_data.get('漲跌')+' ('+m_data.get('漲跌幅')+')\n'     
-      '本益比:'+m_data.get('本益比')+'\n'+     
-      '本淨比:'+m_data.get('本淨比'))
-      rtn_text=st    
-  return rtn_text  
-def Get_TOP_N_Report(num):
-  if(num>20 or num<=0):
-      return "超出上限(20筆)囉"
-  st='TOP前'+str(num)+'\n'        
-  m_data =Func_PTTStock_TopN()                
-  print("Data len:"+str(len(m_data))) 
-  for i in range(0,num+3,1):
-      data=m_data.pop()
-      #濾掉置頂文章,將列表加入列表
-      if i>=3:
-          st += str(i-2)+':['+data['rate']+'] '+data['title']+' '+data['url']+'\n'            
-  print(st)    
-  return st
-       
+      
 if __name__ == '__main__':
   #app.run(ssl_context=('server.crt', 'server.key'),host="0.0.0.0", port=4000 , threaded=True)
   app.run(host="0.0.0.0", port=4000 , threaded=True)

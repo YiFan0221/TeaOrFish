@@ -1,9 +1,9 @@
 from  flask import Blueprint
-Modbus_controller       = Blueprint('Modbus',__name__)
-SSH_controller          = Blueprint('SSH',__name__)
-Stock_controller        = Blueprint('Stock',__name__)
-TickerOrder_controller  = Blueprint('TickerOrder',__name__)
-from . import Modbus
-from . import SSH
-from . import Stock
-from . import TickerOrder
+modbus_controller       = Blueprint('modbus',__name__)
+ssh_controller          = Blueprint('ssh',__name__)
+stock_controller        = Blueprint('stock',__name__)
+tickerOrder_controller  = Blueprint('tickerOrder',__name__)
+from . import modbus
+from . import ssh
+from . import stock
+from . import tickerOrder

@@ -18,7 +18,19 @@ header = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/5
 #headers = {"user-agent": "Mozilla/5.0 (Windows NT 6.1) "
 #"AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36"}
 
-
+def Get_TopRate(mode):
+    num = 10
+    m_data =Func_TopRate(num,mode)
+    if(type(m_data)== str):
+        rtn_text =m_data    
+    else:
+        st=mode+'資本佔比五日排行\n排序\t名稱(代號)\t當日\t2日\t3日\t5日'+'\n'
+        for num in range(1,len(m_data), 1):
+            st = st+ m_data.get(str(num))+'\n'
+        rtn_text=st    
+    return rtn_text
+  
+  
 def Func_PTTStock_TopN():
     print('進入函式:Func_PTTStock_TopN') 
     link = "https://www.ptt.cc/bbs/Stock/index.html" 
@@ -229,4 +241,16 @@ def Func_TopRate(TopNum,mode): #TopNum:int
     print('離開函式:ContinuousTrust 模式:'+mode)   
     return m_data_dict   
    
- 
+def Get_TOP_N_Report(num):
+    if(num>20 or num<=0):
+        return "超出上限(20筆)囉"
+    st='TOP前'+str(num)+'\n'        
+    m_data =Func_PTTStock_TopN()                
+    print("Data len:"+str(len(m_data))) 
+    for i in range(0,num+3,1):
+        data=m_data.pop()
+        #濾掉置頂文章,將列表加入列表
+        if i>=3:
+            st += str(i-2)+':['+data['rate']+'] '+data['title']+' '+data['url']+'\n'            
+    print(st)    
+    return st
