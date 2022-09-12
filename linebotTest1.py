@@ -66,8 +66,9 @@ def RecvCallInfo():
         }]
     }
     # 向指定網址發送 request
-    requests.request('POST', 'https://api.line.me/v2/bot/message/push',headers=headers,data=json.dumps(body).encode('utf-8'))
-
+    req = requests.request('POST', 'https://api.line.me/v2/bot/message/push',headers=headers,data=json.dumps(body).encode('utf-8'))
+    print(req.text)
+    return 200
 
 
 @app.route("/callback",methods=['POST'])
