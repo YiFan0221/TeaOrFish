@@ -57,7 +57,7 @@ def RecvCallInfo():
     
     
     
-    headers = {'Authorization':CHANNEL_ACCESS_TOKEN,'Content-Type':'application/json'}
+    headers = {'Authorization':'Bearer '+CHANNEL_ACCESS_TOKEN,'Content-Type':'application/json'}
     body = {
     'to':userId,
     'messages':[{
