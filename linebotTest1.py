@@ -112,7 +112,7 @@ def handle_message(event):
   print(event.message)
   message_id=event.message.id
   MsgType=event.message.type
-  userId = str(event.source.userId)
+  userId = str(event.source.user_id)
   print('使用者 ID: '+userId)
   if(MsgType=="image"):
       print('[Stepppppppppppppp]['+message_id+' ***收到圖片***]：')        
