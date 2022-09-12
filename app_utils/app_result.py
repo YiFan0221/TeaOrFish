@@ -5,7 +5,7 @@ import json
 
 
 def requests_api(mtext):
-    ServerURL ='http://yfnoip.ddns.net:4000/Stock'
+    ServerURL ='https://yfnoip.ddns.net:4000/Stock'
     #ServerURL ='http://114.34.165.245:4000/Stock'
     apiurl = ServerURL+'/Echo'
     sendobj = {'text':mtext}    
