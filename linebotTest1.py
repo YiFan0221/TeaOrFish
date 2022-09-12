@@ -112,7 +112,8 @@ def handle_message(event):
   print(event.message)
   message_id=event.message.id
   MsgType=event.message.type
-  print('使用者 ID: ${event.source.userId}')
+  userId = str(event.source.userId)
+  print('使用者 ID: '+userId)
   if(MsgType=="image"):
       print('[Stepppppppppppppp]['+message_id+' ***收到圖片***]：')        
       message_content = line_bot_api.get_message_content(message_id)
@@ -193,7 +194,7 @@ def handle_message(event):
             st =Get_SearchStock(mtext)        
             line_bot_api.reply_message(event.reply_token,TextSendMessage( text = st ))     
         elif(mtext=='我的ID' or mtext=='我的id'):
-            line_bot_api.reply_message(event.reply_token,TextSendMessage(text='我的id:'+{event.source.userId}))     
+            line_bot_api.reply_message(event.reply_token,TextSendMessage(text='我的id:'+userId))     
             
 def SwitchSettingMode():
   global Mode
