@@ -194,7 +194,7 @@ def handle_message(event):
             st =Get_SearchStock(mtext)        
             line_bot_api.reply_message(event.reply_token,TextSendMessage( text = st ))     
         elif(mtext=='我的ID' or mtext=='我的id'):
-            line_bot_api.reply_message(event.reply_token,TextSendMessage(text='我的id:'+userId))     
+            line_bot_api.reply_message(event.reply_token,TextSendMessage(text='當前傳訊息帳號的id為:'+userId))     
             
 def SwitchSettingMode():
   global Mode
