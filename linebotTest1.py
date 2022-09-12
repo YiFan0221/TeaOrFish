@@ -50,29 +50,26 @@ def home():
   return render_template("home.html")
 
 
-# @app.route("/Tradingcall",methods=['POST'])
-# def RecvCallInfo():
-#   MASTERD = 16771199787211
-#   CHANNEL_ACCESS_TOKEN =
-# def RecvCallInfo():
-  
-#     CHANNEL_ACCESS_TOKEN = 'QcRH4+cmpgKeP24rDsHblYBgd0qkifKrgJem7GxmHyXCYLvOdZqsUkLFASyAYhjRAiFkeiY8AYd+aF2fW9Zn1FcUc9QBB4AK7AATm1MVc47orHkod3ZAm8hAOsGOLcoSy1XeyZuk+2fN8Afccu97EwdB04t89/1O/w1cDnyilFU='
-#     url = 'https://api.line.me/v2/bot/message/push';
-#     json= {
-#         'headers': {
-#             'Content-Type': 'application/json; charset=UTF-8',
-#             'Authorization': 'Bearer ' + CHANNEL_ACCESS_TOKEN,
-#         },
-#         'method': 'post',
-#         'payload': JSON.stringify({
-#             'to':  '16771199787211',
-#             'messages': [{
-#                 type:'text',
-#                 text:'哈囉我是 Push Message！'
-#             }]
-#         }),
-#     }
-
+@app.route("/Tradingcall",methods=['POST'])
+def RecvCallInfo():  
+    CHANNEL_ACCESS_TOKEN = 'QcRH4+cmpgKeP24rDsHblYBgd0qkifKrgJem7GxmHyXCYLvOdZqsUkLFASyAYhjRAiFkeiY8AYd+aF2fW9Zn1FcUc9QBB4AK7AATm1MVc47orHkod3ZAm8hAOsGOLcoSy1XeyZuk+2fN8Afccu97EwdB04t89/1O/w1cDnyilFU='
+    userId = "U28f735e0a0bff2a9e5c6d75bbb4e1411"
+    url = 'https://api.line.me/v2/bot/message/push';
+    sendobj= {
+        'headers': {
+            'Content-Type': 'application/json; charset=UTF-8',
+            'Authorization': 'Bearer ' + CHANNEL_ACCESS_TOKEN,
+        },
+        'method': 'post',
+        'payload': ({
+            'to':  userId,
+            'messages': [{
+                'type':'text',
+                'text':'哈囉我是 Push Message！'
+            }]
+        }),
+    }
+    requests.post(url, json=sendobj )
 
 
 @app.route("/callback",methods=['POST'])
