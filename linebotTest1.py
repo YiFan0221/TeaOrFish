@@ -54,22 +54,20 @@ def home():
 def RecvCallInfo():  
     CHANNEL_ACCESS_TOKEN = 'QcRH4+cmpgKeP24rDsHblYBgd0qkifKrgJem7GxmHyXCYLvOdZqsUkLFASyAYhjRAiFkeiY8AYd+aF2fW9Zn1FcUc9QBB4AK7AATm1MVc47orHkod3ZAm8hAOsGOLcoSy1XeyZuk+2fN8Afccu97EwdB04t89/1O/w1cDnyilFU='
     userId = "U28f735e0a0bff2a9e5c6d75bbb4e1411"
-    url = 'https://api.line.me/v2/bot/message/push';
-    sendobj= {
-        'headers': {
-            'Content-Type': 'application/json; charset=UTF-8',
-            'Authorization': 'Bearer ' + CHANNEL_ACCESS_TOKEN,
-        },
-        'method': 'post',
-        'payload': ({
-            'to':  userId,
-            'messages': [{
-                'type':'text',
-                'text':'哈囉我是 Push Message！'
-            }]
-        }),
+    
+    
+    
+    headers = {'Authorization':CHANNEL_ACCESS_TOKEN,'Content-Type':'application/json'}
+    body = {
+    'to':userId,
+    'messages':[{
+            'type': 'text',
+            'text': 'hello'
+        }]
     }
-    requests.post(url, json=sendobj )
+    # 向指定網址發送 request
+    requests.request('POST', 'https://api.line.me/v2/bot/message/push',headers=headers,data=json.dumps(body).encode('utf-8'))
+
 
 
 @app.route("/callback",methods=['POST'])
