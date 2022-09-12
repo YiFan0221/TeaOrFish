@@ -192,6 +192,8 @@ def handle_message(event):
         elif(mtext.isdigit() and len(mtext)>=4):
             st =Get_SearchStock(mtext)        
             line_bot_api.reply_message(event.reply_token,TextSendMessage( text = st ))     
+        elif(mtext=='我的ID' or mtext=='我的id'):
+            line_bot_api.reply_message(event.reply_token,TextSendMessage(text='我的id:'+{event.source.userId}))     
             
 def SwitchSettingMode():
   global Mode
