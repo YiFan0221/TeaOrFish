@@ -8,17 +8,17 @@ def requests_api(mtext):
     ###
     #用來執行根據mtext 轉發的api
     ###
-    ServerURL ='http://yfnoip.ddns.net:4000/Stock'
+    ServerURL ='http://yfnoip.ddns.net:5000/Stock'
     
     #ex. 
     # [ testSpace/Echo,HI你好 ] 
     # mtext==[/Echo,HI你好]
-    input_para = mtext.split(',')
+    input_para = mtext[9:].split(',')
     #API URL 
     apiurl = ServerURL+input_para[0]
     #Para
-    sendobj
-    if input_para.count > 1:
+    sendobj = None
+    if len(input_para) > 1:
       sendobj = {'text':input_para[1]}        
     
     #post
