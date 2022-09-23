@@ -4,16 +4,16 @@ import requests
 import json
 
 
-def requests_api(mtext):
+def requests_POST_Stock_api(input_APIAndPara):
     ###
-    #用來執行根據mtext 轉發的api
+    #用來執行<POST>,並根據mtext 轉發的api
     ###
     ServerURL ='http://yfnoip.ddns.net:5000/Stock'
     
     #ex. 
     # [ testSpace/Echo,HI你好 ] 
     # mtext==[/Echo,HI你好]
-    input_para = mtext[9:].split(',')
+    input_para = input_APIAndPara.split(',')
     #API URL 
     apiurl = ServerURL+input_para[0]
     #Para
@@ -27,7 +27,26 @@ def requests_api(mtext):
     #StateSt = requests.post(apiurl, json=sendobj , headers=header, verify=False )
     return StateSt
     
-
+def requests_GET_Stock_api(input_APIAndPara):
+    ###
+    #用來執行<GET>,並根據mtext 轉發的api
+    ###
+    ServerURL ='http://yfnoip.ddns.net:5000/Stock'
+    
+    #ex. 
+    # [ testSpace/Echo,HI你好 ] 
+    # mtext==[/Echo,HI你好]
+    input_para = input_APIAndPara.split(',')
+    #API URL 
+    apiurl = ServerURL+input_para[0]
+    #Para
+    sendobj = None
+    if len(input_para) > 1:
+      sendobj = {'text':input_para[1]}        
+    
+    header = {"content-type": "application/json"}
+    StateSt = requests.get(apiurl, json=sendobj , headers=header, verify=False )
+    return StateSt
 
 status = {
     200:"OK",

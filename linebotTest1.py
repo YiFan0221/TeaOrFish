@@ -5,17 +5,12 @@ from linebot.exceptions import InvalidSignatureError
 from linebot.models import * #MessageEvent,TextMessage,ImageSendMessage
 
 import tempfile
-from controller import stock_controller, modbus_controller,ssh_controller,tickerOrder_controller
-
 from flasgger import Swagger
 from requests import *
 
 #其他後端function
-from backend_models.stocksearch import *
 from backend_models.picIV       import Pic_Auth
-from controller.stock           import *
-from controller.tickerOrder     import *
-from app_utils.app_result       import requests_api
+from app_utils.app_result       import requests_POST_Stock_api,requests_GET_Stock_api
 
 line_bot_api = LineBotApi('QcRH4+cmpgKeP24rDsHblYBgd0qkifKrgJem7GxmHyXCYLvOdZqsUkLFASyAYhjRAiFkeiY8AYd+aF2fW9Zn1FcUc9QBB4AK7AATm1MVc47orHkod3ZAm8hAOsGOLcoSy1XeyZuk+2fN8Afccu97EwdB04t89/1O/w1cDnyilFU=')
 handler = WebhookHandler('976067291be71b6c3e6a3d5c161db416')
@@ -33,43 +28,12 @@ app.config['SWAGGER'] = {
 }
 CORS(app)
 Swagger(app)
-
-#registering blueprints
-#註冊其他藍圖中的controllers
-app.register_blueprint(modbus_controller       , url_prefix='/Modbus')
-app.register_blueprint(ssh_controller          , url_prefix='/SSH')
-app.register_blueprint(stock_controller        , url_prefix='/Stock')
-app.register_blueprint(tickerOrder_controller  , url_prefix='/Ticker')
-                            
-
-print("..........Flask start!")
-
+                          
+print("..........Linebot Flask start!")
 
 @app.route("/")
 def home():
   return render_template("home.html")
-
-
-@app.route("/Tradingcall",methods=['POST'])
-def RecvCallInfo():  
-    CHANNEL_ACCESS_TOKEN = 'QcRH4+cmpgKeP24rDsHblYBgd0qkifKrgJem7GxmHyXCYLvOdZqsUkLFASyAYhjRAiFkeiY8AYd+aF2fW9Zn1FcUc9QBB4AK7AATm1MVc47orHkod3ZAm8hAOsGOLcoSy1XeyZuk+2fN8Afccu97EwdB04t89/1O/w1cDnyilFU='
-    userId = "U28f735e0a0bff2a9e5c6d75bbb4e1411"
-    
-    
-    
-    headers = {'Authorization':'Bearer '+CHANNEL_ACCESS_TOKEN,'Content-Type':'application/json'}
-    body = {
-    'to':userId,
-    'messages':[{
-            'type': 'text',
-            'text': 'hello'
-        }]
-    }
-    # 向指定網址發送 request
-    req = requests.request('POST', 'https://api.line.me/v2/bot/message/push',headers=headers,data=json.dumps(body).encode('utf-8'))
-    print(req.text)
-    return 200
-
 
 @app.route("/callback",methods=['POST'])
 def callback():
@@ -99,10 +63,7 @@ def callback():
   except InvalidSignatureError:
       abort(400)
   return 'OK'
-
-
-          
-
+        
 @handler.add(MessageEvent)
 def handle_message(event):
   print(event.message)
@@ -155,7 +116,8 @@ def handle_message(event):
           line_bot_api.reply_message(event.reply_token,TextSendMessage(text=StateSt))     
       elif mtext[0:9]=='testSpace':
           #這邊要呼叫家裡Server的API
-          StateSt = requests_api(mtext)                    
+          input_APIAndPara = mtext[9:]
+          StateSt = requests_POST_Stock_api(input_APIAndPara)                    
           line_bot_api.reply_message(event.reply_token,TextSendMessage(text=StateSt.text))     
       else: #功能
         if mtext=='aa':
@@ -165,21 +127,14 @@ def handle_message(event):
                 preview_image_url=testresault_st[0]
             )        
             line_bot_api.reply_message(event.reply_token,image_message)
-        elif mtext=='TOP':        
-            st=Get_TOP_N_Report(10)
-            line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))
-        elif mtext=='TOP20':        
-            st=Get_TOP_N_Report(20)
-            line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))
-        elif mtext=='外資比排行' or mtext=='FT':        
-            st=Get_TopRate("外資")
-            line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))
-        elif mtext=='投資比排行' or mtext=='TT':        
-            st=Get_TopRate("投信")
-            line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))
-        elif mtext=='自資比排行' or mtext=='ST':        
-            st=Get_TopRate("自營商")
-            line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))        
+        elif mtext=='TOP':       
+            input_APIAndPara = '/Get_TOP_N_Report,10'
+            StateSt = requests_POST_Stock_api(input_APIAndPara)                    
+            line_bot_api.reply_message(event.reply_token,TextSendMessage(text=StateSt.text))     
+        elif mtext=='TOP20':    
+            input_APIAndPara = '/Get_TOP_N_Report,20'
+            StateSt = requests_POST_Stock_api(input_APIAndPara)                    
+            line_bot_api.reply_message(event.reply_token,TextSendMessage(text=StateSt.text))                  
         elif mtext=='0806449' or mtext=='9527':        
             if mtext=='0806449':
                 st='崊盃喝尿簌簌叫'
@@ -187,8 +142,9 @@ def handle_message(event):
                 st='先生要報統編嗎?'
             line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))     
         elif(mtext.isdigit() and len(mtext)>=4):
-            st =Get_SearchStock(mtext)        
-            line_bot_api.reply_message(event.reply_token,TextSendMessage( text = st ))     
+            input_APIAndPara = '/SearchStock,'+str(mtext)
+            StateSt = requests_GET_Stock_api(input_APIAndPara)                    
+            line_bot_api.reply_message(event.reply_token,TextSendMessage(text=StateSt.text))                
         elif(mtext=='我的ID' or mtext=='我的id'):
             line_bot_api.reply_message(event.reply_token,TextSendMessage(text='當前傳訊息帳號的id為:'+userId))     
             
