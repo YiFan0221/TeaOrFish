@@ -6,7 +6,6 @@ from linebot.models import * #MessageEvent,TextMessage,ImageSendMessage
 
 import tempfile
 from flasgger import Swagger
-from requests import *
 
 #其他後端function
 from backend_models.picIV       import Pic_Auth
