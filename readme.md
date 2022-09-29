@@ -39,10 +39,10 @@ Docker 相關說明
 > sudo docker build --no-cache -t gary80221/teaorfish .
 
 ### 添加版本號
-> sudo docker tag <ContainerID> gary80221/teaorfish:<version>
+> sudo docker tag <ContainerID> gary80221/teaorfish:\<version>
 
 ### 將Image 作為容器
-> sudo docker run --rm --name teaorfish -p 4000:4000 -p 4000:4000/udp -i -t gary80221/teaorfish:<version>
+> sudo docker run --rm --name teaorfish -p 4000:4000 -p 4000:4000/udp -i -t gary80221/teaorfish:\<version>
 
 ####  ※run 前綴說明
 --rm : run image結束時會自動把容器刪掉
