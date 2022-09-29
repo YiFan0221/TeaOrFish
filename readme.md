@@ -24,8 +24,6 @@
 
 ※通常要改這個 jsx-2214436525 info-lp
 
- 6. 解釋key crt csr pem
-> https://haway.30cm.gg/ssl-key-csr-crt-pem/
     
 <br><br />
 
