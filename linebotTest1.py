@@ -165,12 +165,15 @@ def ShowMode():
   global Mode
   return '現在模式為: '+Mode
 
+import ssl
+context = ssl.SSLContext()
+context.load_cert_chain('yfnoip_ddns_net.pem-chain', 'YiFanServer.key')
       
 if __name__ == '__main__':
   #測試用 記得開ngrok
-  #app.run(ssl_context=('YiFanServer.crt', 'YiFanServer.key'),host="0.0.0.0", port=4000 , threaded=True)
+  app.run(ssl_context=context,host="0.0.0.0", port=4000 , threaded=True)
   #上傳Heroku用
-  app.run(host="0.0.0.0", port=4000 , threaded=True)
+  #app.run(host="0.0.0.0", port=4000 , threaded=True)
 #添加SSL
 #https://medium.com/@charming_rust_oyster_221/flask-%E9%85%8D%E7%BD%AE-https-%E7%B6%B2%E7%AB%99-ssl-%E5%AE%89%E5%85%A8%E8%AA%8D%E8%AD%89-36dfeb609fa8
 #產生KEY
