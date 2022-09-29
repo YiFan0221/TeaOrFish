@@ -13,8 +13,10 @@
  2. LineBotDevelopers URL
 > https://developers.line.biz/console/channel/1656189523/messaging-api
 
- 3. ※ URL 通常要掛
+ 3. 現在有三處可掛
 > https://teaorfish.herokuapp.com/callback
+> https://yfnoip.ddns.net:4000/callback
+> https://yifanserver.teaorfish.com:4000/callback
 
  4. LineBot 基本開發
 > https://engineering.linecorp.com/zh-hant/blog/line-device-10/
