@@ -26,7 +26,18 @@
 
 ※通常要改這個 jsx-2214436525 info-lp
 
-    
+# SSL相關
+### OpenSSL 操作筆記 - 產生 CSR
+http://jianiau.blogspot.com/2015/07/openssl-generate-csr.html
+### 產生Key和中繼請求    
+> openssl req -new -sha256 -newkey rsa:2048 -keyout {Name}.key -out {Name}.crr -config {ssl.conf}
+
+### 安裝Snap
+> sudo snap install core; sudo snap refresh core
+
+### 安裝Cerbot
+> sudo snap install --classic certbot
+> 
 <br><br />
 
 Docker 相關說明
