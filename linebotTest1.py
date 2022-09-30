@@ -182,3 +182,5 @@ if __name__ == '__main__':
 #https://certbot.eff.org/instructions?ws=other&os=ubuntufocal
 #如何在 VSCode 設定完整的 .NET Core 建置、發行與部署工作 看第四點
 #https://blog.miniasp.com/post/2019/01/22/Configure-Tasks-and-Launch-in-VSCode-for-NET-Core
+#[SSL 基礎]私有金鑰、CSR 、CRT 與 中繼憑證
+# https://haway.30cm.gg/ssl-key-csr-crt-pem/
