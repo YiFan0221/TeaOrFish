@@ -215,3 +215,18 @@ https://blog.yowko.com/change-container-port-mapping/
 
 > 假如某一天，你突然想改變 port 的對應或者是新增或移除 port ，該怎麼做呢？
 stop container >> commit container to image >> run new image and new port.
+
+
+# Jenkins 筆記(借存)
+### Pull Image
+> docker pull jenkins/jenkins:lts-jdk11
+
+### run Jenkins (在容器內新增一個 /var/jenkins_home 資料夾)
+> docker run -p 8080:8080 -p 50000:50000 --restart=on-failure -v jenkins_home:/var/jenkins_home jenkins/jenkins:lts-jdk11
+
+### 取出初始化密碼
+> sudo docker cp b9258fcdaef4:/var/jenkins_home/secrets/initialAdminPassword ./ 
+
+## 用WebUI控制
+### 管理員使用者
+> root : Gary80221  
