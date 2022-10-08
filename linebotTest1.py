@@ -128,11 +128,11 @@ def handle_message(event):
             line_bot_api.reply_message(event.reply_token,image_message)
         elif mtext=='TOP':       
             input_APIAndPara = '/Get_TOP_N_Report,10'
-            StateSt = requests_POST_Stock_api(input_APIAndPara)                    
+            StateSt = requests_GET_Stock_api(input_APIAndPara)                    
             line_bot_api.reply_message(event.reply_token,TextSendMessage(text=StateSt.text))     
         elif mtext=='TOP20':    
             input_APIAndPara = '/Get_TOP_N_Report,20'
-            StateSt = requests_POST_Stock_api(input_APIAndPara)                    
+            StateSt = requests_GET_Stock_api(input_APIAndPara)                    
             line_bot_api.reply_message(event.reply_token,TextSendMessage(text=StateSt.text))                  
         elif mtext=='0806449' or mtext=='9527':        
             if mtext=='0806449':
