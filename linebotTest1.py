@@ -11,8 +11,12 @@ from flasgger import Swagger
 #from backend_models.picIV       import Pic_Auth
 from app_utils.app_result       import requests_POST_Stock_api,requests_GET_Stock_api
 
-line_bot_api = LineBotApi('QcRH4+cmpgKeP24rDsHblYBgd0qkifKrgJem7GxmHyXCYLvOdZqsUkLFASyAYhjRAiFkeiY8AYd+aF2fW9Zn1FcUc9QBB4AK7AATm1MVc47orHkod3ZAm8hAOsGOLcoSy1XeyZuk+2fN8Afccu97EwdB04t89/1O/w1cDnyilFU=')
-handler = WebhookHandler('976067291be71b6c3e6a3d5c161db416')
+
+LINEBOT_POST_TOKEN = 'QcRH4+cmpgKeP24rDsHblYBgd0qkifKrgJem7GxmHyXCYLvOdZqsUkLFASyAYhjRAiFkeiY8AYd+aF2fW9Zn1FcUc9QBB4AK7AATm1MVc47orHkod3ZAm8hAOsGOLcoSy1XeyZuk+2fN8Afccu97EwdB04t89/1O/w1cDnyilFU='
+LINEBOT_RECV_TOKEN = '976067291be71b6c3e6a3d5c161db416'
+
+Linebot_Post_handle = LineBotApi(LINEBOT_POST_TOKEN)
+Linebot_Recv_handle = WebhookHandler(LINEBOT_RECV_TOKEN)
 
  
 Mode = 'setting'
@@ -58,12 +62,12 @@ def callback():
   signature = request.headers['X-Line-Signature']
   body = request.get_data(as_text=True)
   try:
-      handler.handle(body,signature)
+      Linebot_Recv_handle.handle(body,signature)
   except InvalidSignatureError:
       abort(400)
   return 'OK'
         
-@handler.add(MessageEvent)
+@Linebot_Recv_handle.add(MessageEvent)
 def handle_message(event):
   print(event.message)
   message_id=event.message.id
@@ -72,7 +76,7 @@ def handle_message(event):
   print('使用者 ID: '+userId)
   if(MsgType=="image"):
       print('[Stepppppppppppppp]['+message_id+' ***收到圖片***]：')        
-      message_content = line_bot_api.get_message_content(message_id)
+      message_content = Linebot_Post_handle.get_message_content(message_id)
       print('[Stepppppppppppppp]取得檔案') 
       
       img_st="null"
@@ -94,7 +98,7 @@ def handle_message(event):
       img_st=Pic_Auth(file_path)        
       print('[Stepppppppppppppp]辨識完畢,刪除暫存')     
                                     
-      line_bot_api.reply_message(event.reply_token,TextSendMessage(text=img_st))  
+      Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=img_st))  
         
   elif(MsgType=="text"):
       mtext=event.message.text
@@ -108,16 +112,16 @@ def handle_message(event):
           StateSt += SwitchSettingMode()
           StateSt += '\n'
           StateSt += ShowMode()
-          line_bot_api.reply_message(event.reply_token,TextSendMessage(text=StateSt))     
+          Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=StateSt))     
       elif mtext=='switcM':
           StateSt =''
           StateSt += ShowMode()
-          line_bot_api.reply_message(event.reply_token,TextSendMessage(text=StateSt))     
+          Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=StateSt))     
       elif mtext[0:9]=='testSpace':
           #這邊要呼叫家裡Server的API
           input_APIAndPara = mtext[9:]
           StateSt = requests_POST_Stock_api(input_APIAndPara)                    
-          line_bot_api.reply_message(event.reply_token,TextSendMessage(text=StateSt.text))     
+          Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=StateSt.text))     
       else: #功能
         if mtext=='aa':
             testresault_st=Func_thsrcOrder()        
@@ -125,27 +129,27 @@ def handle_message(event):
                 original_content_url=testresault_st[0],
                 preview_image_url=testresault_st[0]
             )        
-            line_bot_api.reply_message(event.reply_token,image_message)
+            Linebot_Post_handle.reply_message(event.reply_token,image_message)
         elif mtext=='TOP':       
             input_APIAndPara = '/Get_TOP_N_Report,10'
             StateSt = requests_GET_Stock_api(input_APIAndPara)                    
-            line_bot_api.reply_message(event.reply_token,TextSendMessage(text=StateSt.text))     
+            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=StateSt.text))     
         elif mtext=='TOP20':    
             input_APIAndPara = '/Get_TOP_N_Report,20'
             StateSt = requests_GET_Stock_api(input_APIAndPara)                    
-            line_bot_api.reply_message(event.reply_token,TextSendMessage(text=StateSt.text))                  
+            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=StateSt.text))                  
         elif mtext=='0806449' or mtext=='9527':        
             if mtext=='0806449':
                 st='崊盃喝尿簌簌叫'
             elif mtext=='23965088':
                 st='先生要報統編嗎?'
-            line_bot_api.reply_message(event.reply_token,TextSendMessage(text=st))     
+            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=st))     
         elif(mtext.isdigit() and len(mtext)>=4):
             input_APIAndPara = '/SearchStock,'+str(mtext)
             StateSt = requests_GET_Stock_api(input_APIAndPara)                    
-            line_bot_api.reply_message(event.reply_token,TextSendMessage(text=StateSt.text))                
+            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=StateSt.text))                
         elif(mtext=='我的ID' or mtext=='我的id'):
-            line_bot_api.reply_message(event.reply_token,TextSendMessage(text='當前傳訊息帳號的id為:'+userId))     
+            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text='當前傳訊息帳號的id為:'+userId))     
             
 def SwitchSettingMode():
   global Mode
