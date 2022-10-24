@@ -1,7 +1,6 @@
 Flask==2.0.1
 gunicorn
 line-bot-sdk==1.19.0
-beautifulsoup4==4.9.3
 APScheduler==3.6.1
 flasgger==0.9.5
 flask_cors
