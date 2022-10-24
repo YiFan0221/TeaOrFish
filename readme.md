@@ -2,11 +2,15 @@
 # 專案說明
 ===================
 
-## 此專案專門做為Linebot的接收服務並會將需求轉發給其他的服務Server
+## 此專案專門做為Linebot的接收服務並將需求轉給Server
 
 <br><br />
-
-
+### [Environment]
+### LINEBOT_POST_TOKEN = {from post token}
+### LINEBOT_RECV_TOKEN = {from post token}
+### CONNECTSTRING = {mongodb connection string}
+<br><br />
+# 要點
  1. Heroku雲端URL
 > https://dashboard.heroku.com/apps/teaorfish/logs
 
@@ -25,6 +29,7 @@
 > https://invest.cnyes.com/twstock/TWS/2330
 
 ※通常要改這個 jsx-2214436525 info-lp
+<br><br />
 
 # SSL相關
 ### OpenSSL 操作筆記 - 產生 CSR
@@ -55,7 +60,10 @@ Docker 相關說明
 > sudo docker tag <ContainerID> gary80221/teaorfish:\<version>
 
 ### 將Image 作為容器
-> sudo docker run --rm --name teaorfish -p 4000:4000 -p 4000:4000/udp -i -t gary80221/teaorfish:\<version>
+
+> sudo docker run -e LINEBOT_POST_TOKEN={} LINEBOT_RECV_TOKEN = {} CONNECTSTRING = {}
+retryWrites=true&w=majority --rm --name teaorfish -p 4000:4000 -p 4000:4000/udp -i -t gary80221/teaorfish:\<version>
+ 
 
 ####  ※run 前綴說明
 --rm : run image結束時會自動把容器刪掉

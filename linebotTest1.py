@@ -3,7 +3,7 @@ from flask_cors import CORS
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import * #MessageEvent,TextMessage,ImageSendMessage
-
+import os
 import tempfile
 from flasgger import Swagger
 
@@ -11,9 +11,8 @@ from flasgger import Swagger
 #from backend_models.picIV       import Pic_Auth
 from app_utils.app_result       import requests_POST_Stock_api,requests_GET_Stock_api
 
-
-LINEBOT_POST_TOKEN = 'QcRH4+cmpgKeP24rDsHblYBgd0qkifKrgJem7GxmHyXCYLvOdZqsUkLFASyAYhjRAiFkeiY8AYd+aF2fW9Zn1FcUc9QBB4AK7AATm1MVc47orHkod3ZAm8hAOsGOLcoSy1XeyZuk+2fN8Afccu97EwdB04t89/1O/w1cDnyilFU='
-LINEBOT_RECV_TOKEN = '976067291be71b6c3e6a3d5c161db416'
+LINEBOT_POST_TOKEN = os.environ.get('LINEBOT_POST_TOKEN')
+LINEBOT_RECV_TOKEN = os.environ.get('LINEBOT_RECV_TOKEN')
 
 Linebot_Post_handle = LineBotApi(LINEBOT_POST_TOKEN)
 Linebot_Recv_handle = WebhookHandler(LINEBOT_RECV_TOKEN)
