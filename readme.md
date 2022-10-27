@@ -62,8 +62,7 @@ Docker 相關說明
 
 ### 將Image 作為容器
 
-> sudo docker run -e LINEBOT_POST_TOKEN={} LINEBOT_RECV_TOKEN = {} CONNECTSTRING = {}
-retryWrites=true&w=majority --rm --name teaorfish -p 4000:4000 -p 4000:4000/udp -i -t gary80221/teaorfish:\<version>
+> sudo docker run --rm --name teaorfish -p 4000:4000 -p 4000:4000/udp -d -e LINEBOT_POST_TOKEN={} -e LINEBOT_RECV_TOKEN={} -e CONNECTSTRING={} -e TARGET_SERVER_URL={} gary80221/teaorfish:\<version>
  
 
 ####  ※run 前綴說明
