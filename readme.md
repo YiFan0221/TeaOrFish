@@ -9,6 +9,7 @@
 ### LINEBOT_POST_TOKEN = {from post token}
 ### LINEBOT_RECV_TOKEN = {from post token}
 ### CONNECTSTRING = {mongodb connection string}
+### TARGET_SERVER_URL = {http://IP or domain :5000}
 <br><br />
 # 要點
  1. Heroku雲端URL
