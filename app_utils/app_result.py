@@ -2,13 +2,14 @@
 from flask import jsonify ,request
 import requests
 import json
-
+import os
+TARGET_SERVER_URL = os.environ.get('TARGET_SERVER_URL')
 
 def requests_POST_Stock_api(input_APIAndPara):
     ###
     #用來執行<POST>,並根據mtext 轉發的api
     ###
-    ServerURL ='http://yfnoip.ddns.net:5000/Stock'
+    ServerURL =TARGET_SERVER_URL+'/Stock'
     
     #ex. 
     # [ testSpace/Echo,HI你好 ] 
@@ -31,7 +32,7 @@ def requests_GET_Stock_api(input_APIAndPara):
     ###
     #用來執行<GET>,並根據mtext 轉發的api
     ###
-    ServerURL ='http://yfnoip.ddns.net:5000/Stock'
+    ServerURL =TARGET_SERVER_URL+'/Stock'
     
     #ex. 
     # [ testSpace/Echo,HI你好 ] 
@@ -44,8 +45,9 @@ def requests_GET_Stock_api(input_APIAndPara):
     if len(input_para) > 1:
       sendobj = {'text':input_para[1]}        
     
-    header = {"content-type": "application/json"}
+    header = {'Connection':'close',"content-type": "application/json"}
     StateSt = requests.get(apiurl, json=sendobj , headers=header, verify=False )
+    
     return StateSt
 
 status = {

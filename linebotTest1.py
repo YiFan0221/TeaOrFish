@@ -14,6 +14,7 @@ from app_utils.app_result       import requests_POST_Stock_api,requests_GET_Stoc
 LINEBOT_POST_TOKEN = os.environ.get('LINEBOT_POST_TOKEN')
 LINEBOT_RECV_TOKEN = os.environ.get('LINEBOT_RECV_TOKEN')
 
+
 Linebot_Post_handle = LineBotApi(LINEBOT_POST_TOKEN)
 Linebot_Recv_handle = WebhookHandler(LINEBOT_RECV_TOKEN)
 
