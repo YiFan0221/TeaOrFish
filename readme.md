@@ -36,7 +36,8 @@
 ### OpenSSL 操作筆記 - 產生 CSR
 http://jianiau.blogspot.com/2015/07/openssl-generate-csr.html
 ### 產生Key和中繼請求    
-> openssl req -new -sha256 -newkey rsa:2048 -keyout {Name}.key -out {Name}.crr -config {ssl.conf}
+> openssl req -new -nodes -sha256 -newkey rsa:2048 -keyout YiFanServer.key -out YiFanServer.pem -config ssl.conf
+> openssl req -x509 -new -nodes -sha256 -newkey rsa:2048 -keyout YiFanServer.key -out YiFanServer.crt -config ssl.conf
 
 ### 安裝Snap
 > sudo snap install core; sudo snap refresh core
