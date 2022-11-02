@@ -171,7 +171,7 @@ def ShowMode():
 
 import ssl
 context = ssl.SSLContext()
-context.load_cert_chain('yfnoip_ddns_net.pem-chain', 'YiFanServer.key')
+context.load_cert_chain('teaorfish.crt', 'teaorfish.key')
       
 if __name__ == '__main__':
   #測試用 記得開ngrok

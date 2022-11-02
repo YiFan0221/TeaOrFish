@@ -1,1 +1,7 @@
 .env
+yfnoip_ddns_net.pem-chain
+yfnoip_ddns_net.pem
+YiFanServer.crt
+YiFanServer.csr
+YiFanServer.key
+ssl.conf
