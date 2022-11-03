@@ -38,6 +38,10 @@ print("..........Linebot Flask start!")
 def home():
   return render_template("home.html")
 
+@app.route("/.well-known/acme-challenge/fKno72R1QH41oxIYC_FWMbivpvGQe0GIZRTUG0VWafs")
+def forcetbot():
+  return render_template("cerbot.html")
+
 @app.route("/callback",methods=['POST'])
 def callback():
   """
@@ -169,9 +173,10 @@ def ShowMode():
   global Mode
   return '現在模式為: '+Mode
 
+
 import ssl
 context = ssl.SSLContext()
-context.load_cert_chain('teaorfish.crt', 'teaorfish.key')
+context.load_cert_chain("./SSL/fullchain1.pem", "./SSL/privkey1.pem")
       
 if __name__ == '__main__':
   #測試用 記得開ngrok
