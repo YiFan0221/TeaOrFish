@@ -1,0 +1,32 @@
+version: "3.3"
+  
+services:
+  teaorfish:
+    image: gary80221/teaorfish
+    ports:
+      - "4000:4000"
+
+    environment:      
+      LINEBOT_POST_TOKEN: ${LINEBOT_POST_TOKEN}
+      LINEBOT_RECV_TOKEN: ${LINEBOT_RECV_TOKEN}     
+      TARGET_SERVER_URL : ${TARGET_SERVER_URL}
+      SSL_PEM : /run/secrets/SSL_PEM
+      SSL_KEY : /run/secrets/SSL_KEY
+    secrets:
+      - SSL_PEM
+      - SSL_KEY
+    # networks:
+    #   - app-net
+
+secrets:
+  SSL_PEM:
+    file: ./SSL_YiFanServer/yfnoip_ddns_net.pem-chain
+  SSL_KEY: 
+    file: ./SSL_YiFanServer/YiFanServer.Key
+  
+
+# networks:
+#   app-net:
+#     external:
+#       name: nat
+ 

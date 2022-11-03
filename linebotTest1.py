@@ -11,8 +11,10 @@ from flasgger import Swagger
 #from backend_models.picIV       import Pic_Auth
 from app_utils.app_result       import requests_POST_Stock_api,requests_GET_Stock_api
 
-LINEBOT_POST_TOKEN = os.environ.get('LINEBOT_POST_TOKEN')
-LINEBOT_RECV_TOKEN = os.environ.get('LINEBOT_RECV_TOKEN')
+LINEBOT_POST_TOKEN  = os.environ.get('LINEBOT_POST_TOKEN')
+LINEBOT_RECV_TOKEN  = os.environ.get('LINEBOT_RECV_TOKEN')
+SSL_PEM             = os.environ.get('SSL_PEM')
+SSL_KEY             = os.environ.get('SSL_KEY')
 
 
 Linebot_Post_handle = LineBotApi(LINEBOT_POST_TOKEN)
@@ -173,14 +175,16 @@ def ShowMode():
   global Mode
   return '現在模式為: '+Mode
 
+print(str( os.path.exists("/run/secrets/SSL_PEM") ))
+print(str( os.path.exists("/run/secrets/SSL_KEY") ))
 
 import ssl
 context = ssl.SSLContext()
-context.load_cert_chain("./SSL_YiFanServer/yfnoip_ddns_net.pem-chain", "./SSL_YiFanServer/YiFanServer.Key")
+context.load_cert_chain(SSL_PEM,SSL_KEY)
       
 if __name__ == '__main__':
   #測試用 記得開ngrok
-  app.run(ssl_context=context,host="0.0.0.0", port=4000 , threaded=True)
+  app.run(ssl_context=context,host="0.0.0.0" ,port=4000, threaded=True)
   #上傳Heroku用
   #app.run(host="0.0.0.0", port=4000 , threaded=True)
 #添加SSL
