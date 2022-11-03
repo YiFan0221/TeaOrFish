@@ -6,10 +6,10 @@
 
 <br><br />
 ### [Environment]
-### LINEBOT_POST_TOKEN = {from post token}
-### LINEBOT_RECV_TOKEN = {from post token}
-### CONNECTSTRING = {mongodb connection string}
-### TARGET_SERVER_URL = {http://IP or domain :5000}
+* LINEBOT_POST_TOKEN = {from post token}
+* LINEBOT_RECV_TOKEN = {from post token}
+* CONNECTSTRING = {mongodb connection string}
+* TARGET_SERVER_URL = {http://IP or domain :5000}
 <br><br />
 # 要點
  1. Heroku雲端URL
@@ -35,8 +35,8 @@
 # SSL相關
 ### OpenSSL 操作筆記 - 產生 CSR
 http://jianiau.blogspot.com/2015/07/openssl-generate-csr.html
-### 產生Key和中繼請求    
-> openssl req -x509 -new -nodes -sha256 -newkey rsa:2048 -keyout YiFanServer.key -out YiFanServer.crt -config ssl.conf
+### 產生Key和中繼請求    (但這邊只是自簽)
+> openssl req -x509 -new -nodes -sha256 -newkey rsa:2048 -keyout teaorfish.key -out teaorfish.crt -config ssl.conf
 
 ### 安裝Snap
 > sudo snap install core; sudo snap refresh core
@@ -54,13 +54,13 @@ Docker 相關說明
 
 ##  \<version> = 1.0.1
 
-### Docker build  -t 要建立出的image名稱  --no-cache 從頭執行
+* Docker build  -t 要建立出的image名稱  --no-cache 從頭執行
 > sudo docker build --no-cache -t gary80221/teaorfish .
 
-### 添加版本號
+* 添加版本號
 > sudo docker tag <ContainerID> gary80221/teaorfish:\<version>
 
-### 將Image 作為容器
+* 將Image 作為容器
 
 > sudo docker run --rm --name teaorfish -p 4000:4000 -p 4000:4000/udp -d -e LINEBOT_POST_TOKEN={} -e LINEBOT_RECV_TOKEN={} -e CONNECTSTRING={} -e TARGET_SERVER_URL={} gary80221/teaorfish:\<version>
  
@@ -74,21 +74,22 @@ Docker 相關說明
 --restart=always : 作用 https://www.cnblogs.com/kaishirenshi/p/10396446.html
 
 
-### 啟用容器
+* 啟用容器
 > sudo docker start teaorfish
 
-### 進入容器
+* 進入容器
 > sudo docker attach teaorfish
 
-### 在容器外對容器下命令 示範從外部執行 bash
+* 在容器外對容器下命令 示範從外部執行 bash
 > sudo docker exec -it teaorfish /bin/bash
 
+<br></br>
 ## 移除容器與IMAGE
-### 停止容器
+* 停止容器
 > sudo docker stop teaorfish
-### 移除容器
+* 移除容器
 > sudo docker rm teaorfish
-### 移除IMAGE
+* 移除IMAGE
 > sudo docker rmi gary80221/teaorfish:\<version>
 
 <br><br />
@@ -130,15 +131,61 @@ DockerFilse 編寫流程
 =============================
 > 參考 https://ithelp.ithome.com.tw/articles/10192824
 
-#### 先登入
-    sudo docker login
+1. 先登入
+> sudo docker login
 
-#### 推送到docker imagehub
+2. 推送到docker imagehub
 > sudo docker push gary80221/teaorfish:\<version>
 
-#### 到別台電腦在拉下來
+3. 到別台電腦在拉下來
 > sudo docker pull gary80221/teaorfish:\<version>
 
+<br><br />
+Docker compose
+=============================
+* 建立網路nat
+> docker network create nat
+
+* 建立 並使用三個容器分攤 (類似docker的run)
+> docker-compose up -d --scale teaorfish=3
+
+* 停止
+> docker-compose stop {name}
+
+* 開始
+> docker-compose start {name}
+
+* 移除 將較於up是建立 down則是移除 
+> docker-compose down
+* 若要開啟3個容器則要再輸入一次
+> docker-compose up -d --scale teaorfish=3
+
+
+<br></br>
+### 使用secretes 存取機密檔案
+* 在最上層宣告並引入檔案到secretes
+> secrets:
+> 
+> {縮排*1} SSL_PEM:
+>
+> {縮排*2} file: {當前要存取檔案的路徑}
+>
+* 在服務內宣告要使用的secretes 並且在環境參數中將對應檔案宣告在環境參數中
+>   environment:      
+
+>      LINEBOT_POST_TOKEN: ${LINEBOT_POST_TOKEN}
+>      LINEBOT_RECV_TOKEN: ${LINEBOT_RECV_TOKEN}     
+>      TARGET_SERVER_URL : ${TARGET_SERVER_URL}
+>      SSL_PEM : /run/secrets/SSL_PEM
+>      SSL_KEY : /run/secrets/SSL_KEY
+
+>    secrets:
+
+>      - SSL_PEM
+>      - SSL_KEY
+
+
+### 
 
 <br><br />
 
@@ -226,15 +273,15 @@ stop container >> commit container to image >> run new image and new port.
 
 
 # Jenkins 筆記(借存)
-### Pull Image
+*###* Pull Image
 > docker pull jenkins/jenkins:lts-jdk11
 
-### run Jenkins (在容器內新增一個 /var/jenkins_home 資料夾)
+* run Jenkins (在容器內新增一個 /var/jenkins_home 資料夾)
 > docker run -p 8080:8080 -p 50000:50000 --restart=on-failure -v jenkins_home:/var/jenkins_home jenkins/jenkins:lts-jdk11
 
-### 取出初始化密碼
+* 取出初始化密碼
 > sudo docker cp b9258fcdaef4:/var/jenkins_home/secrets/initialAdminPassword ./ 
 
 ## 用WebUI控制
-### 管理員使用者
+* 管理員使用者
 > root : Gary80221  
