@@ -176,7 +176,7 @@ def ShowMode():
 
 import ssl
 context = ssl.SSLContext()
-context.load_cert_chain("./SSL/fullchain1.pem", "./SSL/privkey1.pem")
+context.load_cert_chain("./SSL_YiFanServer/YiFanServerKey.pem", "./SSL_YiFanServer/YiFanServer.key")
       
 if __name__ == '__main__':
   #測試用 記得開ngrok
