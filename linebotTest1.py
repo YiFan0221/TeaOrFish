@@ -15,6 +15,7 @@ LINEBOT_POST_TOKEN  = os.environ.get('LINEBOT_POST_TOKEN')
 LINEBOT_RECV_TOKEN  = os.environ.get('LINEBOT_RECV_TOKEN')
 SSL_PEM             = os.environ.get('SSL_PEM')
 SSL_KEY             = os.environ.get('SSL_KEY')
+SERVER_PORT         = os.environ.get('TEAORFISH_SERVER_PORT')
 
 
 Linebot_Post_handle = LineBotApi(LINEBOT_POST_TOKEN)
@@ -184,7 +185,7 @@ context.load_cert_chain(SSL_PEM,SSL_KEY)
       
 if __name__ == '__main__':
   #測試用 記得開ngrok
-  app.run(ssl_context=context,host="0.0.0.0" ,port=4000, threaded=True)
+  app.run(ssl_context=context,host="0.0.0.0" ,port=SERVER_PORT, threaded=True)
   #上傳Heroku用
   #app.run(host="0.0.0.0", port=4000 , threaded=True)
 #添加SSL

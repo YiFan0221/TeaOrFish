@@ -5,11 +5,13 @@ services:
     image: gary80221/teaorfish
     ports:
       - "4000:4000"
+    build: .
 
     environment:      
       LINEBOT_POST_TOKEN: ${LINEBOT_POST_TOKEN}
       LINEBOT_RECV_TOKEN: ${LINEBOT_RECV_TOKEN}     
       TARGET_SERVER_URL : ${TARGET_SERVER_URL}
+      TEAORFISH_SERVER_PORT: ${TEAORFISH_SERVER_PORT}
       SSL_PEM : /run/secrets/SSL_PEM
       SSL_KEY : /run/secrets/SSL_KEY
     secrets:
