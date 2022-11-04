@@ -1,39 +1,32 @@
-
+from enum import Enum, unique
 from flask import jsonify ,request
 import requests
 import json
 import os
 TARGET_SERVER_URL = os.environ.get('TARGET_SERVER_URL')
 
+
+@unique
+class RESTful(Enum):
+    GET = 0
+    POST= 1
+
 def requests_POST_Stock_api(input_APIAndPara):
     ###
     #用來執行<POST>,並根據mtext 轉發的api
     ###
     ServerURL =TARGET_SERVER_URL+'/Stock'
-    
-    #ex. 
-    # [ testSpace/Echo,HI你好 ] 
-    # mtext==[/Echo,HI你好]
-    input_para = input_APIAndPara.split(',')
-    #API URL 
-    apiurl = ServerURL+input_para[0]
-    #Para
-    sendobj = None
-    if len(input_para) > 1:
-      sendobj = {'text':input_para[1]}        
-    
-    #post
-    StateSt = requests.post(apiurl, json=sendobj )
-    #header = {"content-type": "application/json"}
-    #StateSt = requests.post(apiurl, json=sendobj , headers=header, verify=False )
-    return StateSt
+    return requests_api(RESTful.POST,ServerURL,input_APIAndPara)
     
 def requests_GET_Stock_api(input_APIAndPara):
     ###
     #用來執行<GET>,並根據mtext 轉發的api
     ###
     ServerURL =TARGET_SERVER_URL+'/Stock'
-    
+    return requests_api(RESTful.GET , ServerURL,input_APIAndPara)
+        
+        
+def requests_api(REST:RESTful , ServerURL:str , input_APIAndPara):    
     #ex. 
     # [ testSpace/Echo,HI你好 ] 
     # mtext==[/Echo,HI你好]
@@ -46,10 +39,13 @@ def requests_GET_Stock_api(input_APIAndPara):
       sendobj = {'text':input_para[1]}        
     
     header = {'Connection':'close',"content-type": "application/json"}
-    StateSt = requests.get(apiurl, json=sendobj , headers=header, verify=False )
     
+    if(REST == RESTful.GET):
+      StateSt = requests.get(apiurl, json=sendobj , headers=header, verify=False )  
+    elif(REST == RESTful.POST):
+      StateSt = requests.post(apiurl, json=sendobj , headers=header, verify=False)
     return StateSt
-
+            
 status = {
     200:"OK",
     400:"Bad Request",

@@ -11,19 +11,28 @@ from flasgger import Swagger
 #from backend_models.picIV       import Pic_Auth
 from app_utils.app_result       import requests_POST_Stock_api,requests_GET_Stock_api
 
+print("[Inital][ENV]")
 LINEBOT_POST_TOKEN  = os.environ.get('LINEBOT_POST_TOKEN')
 LINEBOT_RECV_TOKEN  = os.environ.get('LINEBOT_RECV_TOKEN')
+TARGET_SERVER_URL   = os.environ.get('TARGET_SERVER_URL')
 SSL_PEM             = os.environ.get('SSL_PEM')
 SSL_KEY             = os.environ.get('SSL_KEY')
 SERVER_PORT         = os.environ.get('TEAORFISH_SERVER_PORT')
 
+print("ENV:LINEBOT_POST_TOKEN : "+LINEBOT_POST_TOKEN )
+print("ENV:TARGET_SERVER_URL  : "+TARGET_SERVER_URL )
+print("ENV:LINEBOT_RECV_TOKEN : "+LINEBOT_RECV_TOKEN )
+print("ENV:SERVER_PORT        : "+str(SERVER_PORT) )
+print("ENV:SECRETS_SSL_PEM    : "+str( os.path.exists("/run/secrets/SSL_PEM") ))
+print("ENV:SECRETS_SSL_KEY    : "+str( os.path.exists("/run/secrets/SSL_KEY") ))
+print("ENV:SSL_PEM            : "+str( SSL_PEM))
+print("ENV:SSL_KEY            : "+str( SSL_KEY))
 
 Linebot_Post_handle = LineBotApi(LINEBOT_POST_TOKEN)
 Linebot_Recv_handle = WebhookHandler(LINEBOT_RECV_TOKEN)
-
- 
 Mode = 'setting'
 
+print("[Inital][Swagger]")
 app = Flask(__name__)
 app.config['SWAGGER'] = {
     "title": "TeaOrFish",
@@ -34,9 +43,13 @@ app.config['SWAGGER'] = {
 }
 CORS(app)
 Swagger(app)
-                          
-print("..........Linebot Flask start!")
 
+print("[Inital][SSL]")                          
+
+import ssl
+context = ssl.SSLContext()
+context.load_cert_chain(SSL_PEM,SSL_KEY)
+      
 @app.route("/")
 def home():
   return render_template("home.html")
@@ -81,62 +94,24 @@ def handle_message(event):
   MsgType=event.message.type
   userId = str(event.source.user_id)
   print('使用者 ID: '+userId)
-  if(MsgType=="image"):
-      print('[Stepppppppppppppp]['+message_id+' ***收到圖片***]：')        
-      message_content = Linebot_Post_handle.get_message_content(message_id)
-      print('[Stepppppppppppppp]取得檔案') 
-      
-      img_st="null"
-      #本地路徑 本地絕對路徑
-      #file_path = os.path.abspath(os.path.dirname(__file__)) + "\\" +message_id+".jpg"      
-      #print('[Stepppppppppppppp]準備複製來源檔案:'+file_path)
-      #with open(file_path, 'wb') as fd:
-      #    for chunk in message_content.iter_content():
-      #        fd.write(chunk)
-      #img_st=Pic_Auth(file_path)        
-      #print('[Stepppppppppppppp]辨識完畢,刪除暫存') 
-      
-      #生成臨時文件 tempfile.NamedTemporaryFile
-      print('[Stepppppppppppppp]準備複製來源檔案:')
-      with tempfile.NamedTemporaryFile(suffix='.jpg',delete=False) as tf:
-          for chunk in message_content.iter_content():
-              tf.write(chunk)
-          file_path = tf.name                
-      img_st=Pic_Auth(file_path)        
-      print('[Stepppppppppppppp]辨識完畢,刪除暫存')     
-                                    
-      Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=img_st))  
         
-  elif(MsgType=="text"):
+  if(MsgType=="text"):
       mtext=event.message.text
       print('['+message_id+' ***收到文字***]：')
       
       #先檢查是不是設定模式
       if mtext=='switch':                
-          StateSt =''
-          StateSt += ShowMode()
-          StateSt += '\n'
-          StateSt += SwitchSettingMode()
-          StateSt += '\n'
-          StateSt += ShowMode()
-          Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=StateSt))     
+          Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=SwitchSettingMode()))     
       elif mtext=='switcM':
-          StateSt =''
-          StateSt += ShowMode()
-          Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=StateSt))     
+          Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=ShowMode()))     
       elif mtext[0:9]=='testSpace':
           #這邊要呼叫家裡Server的API
           input_APIAndPara = mtext[9:]
           StateSt = requests_POST_Stock_api(input_APIAndPara)                    
           Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=StateSt.text))     
       else: #功能
-        if mtext=='aa':
-            testresault_st=Func_thsrcOrder()        
-            image_message=ImageSendMessage(
-                original_content_url=testresault_st[0],
-                preview_image_url=testresault_st[0]
-            )        
-            Linebot_Post_handle.reply_message(event.reply_token,image_message)
+        if(mtext=='我的ID' or mtext=='我的id'):
+            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text='當前傳訊息帳號的id為:'+userId))                   
         elif mtext=='TOP':       
             input_APIAndPara = '/Get_TOP_N_Report,10'
             StateSt = requests_GET_Stock_api(input_APIAndPara)                    
@@ -145,26 +120,50 @@ def handle_message(event):
             input_APIAndPara = '/Get_TOP_N_Report,20'
             StateSt = requests_GET_Stock_api(input_APIAndPara)                    
             Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=StateSt.text))                  
-        elif mtext=='0806449' or mtext=='9527':        
-            if mtext=='0806449':
-                st='崊盃喝尿簌簌叫'
-            elif mtext=='23965088':
-                st='先生要報統編嗎?'
-            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=st))     
         elif(mtext.isdigit() and len(mtext)>=4):
             input_APIAndPara = '/SearchStock,'+str(mtext)
             StateSt = requests_GET_Stock_api(input_APIAndPara)                    
-            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=StateSt.text))                
-        elif(mtext=='我的ID' or mtext=='我的id'):
-            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text='當前傳訊息帳號的id為:'+userId))     
-            
+            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=StateSt.text))                 
+  elif(MsgType=="image"):    
+      
+      print('[Step]['+message_id+' ***收到圖片***]：')        
+      message_content = Linebot_Post_handle.get_message_content(message_id)
+      print('[Step]取得檔案')                       
+      img_st="null"
+      
+      #region  #因為之前在雲端權限問題，無法以二進位分析，這邊之後要用socket給後端辨識
+      # 方法1
+      #本地路徑 本地絕對路徑
+      # file_path = os.path.abspath(os.path.dirname(__file__)) + "\\" +message_id+".jpg"      
+      # print('[Step]準備複製來源檔案:'+file_path)
+      # with open(file_path, 'wb') as fd:
+      #    for chunk in message_content.iter_content():
+      #        fd.write(chunk)
+      # img_st=Pic_Auth(file_path)        
+      # print('[Step]辨識完畢,刪除暫存') 
+      # Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=img_st))  
+      
+      # 方法2
+      #生成臨時文件 tempfile.NamedTemporaryFile
+      # print('[Step]準備複製來源檔案:')
+      # with tempfile.NamedTemporaryFile(suffix='.jpg',delete=False) as tf:
+      #     for chunk in message_content.iter_content():
+      #         tf.write(chunk)
+      #     file_path = tf.name                
+      # img_st=Pic_Auth(file_path)        
+      # print('[Step]辨識完畢,刪除暫存')                                         
+      # Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=img_st))  
+      
+      #endregion #因為之前在雲端權限問題，無法以二進位分析，這邊之後要用socket給後端辨識    
+      
 def SwitchSettingMode():
   global Mode
+  oldMode = Mode
   if(Mode == 'setting'):
     Mode = 'normal'
   else :
     Mode = 'setting'
-  return '更換為'+Mode
+  return '模式:'+oldMode+' 更換為:'+Mode
     
 def CheckSettingMode():
   global Mode
@@ -176,25 +175,6 @@ def ShowMode():
   global Mode
   return '現在模式為: '+Mode
 
-print(str( os.path.exists("/run/secrets/SSL_PEM") ))
-print(str( os.path.exists("/run/secrets/SSL_KEY") ))
-
-import ssl
-context = ssl.SSLContext()
-context.load_cert_chain(SSL_PEM,SSL_KEY)
-      
+print("[Finnish]..........Linebot Flask start!")
 if __name__ == '__main__':
-  #測試用 記得開ngrok
   app.run(ssl_context=context,host="0.0.0.0" ,port=SERVER_PORT, threaded=True)
-  #上傳Heroku用
-  #app.run(host="0.0.0.0", port=4000 , threaded=True)
-#添加SSL
-#https://medium.com/@charming_rust_oyster_221/flask-%E9%85%8D%E7%BD%AE-https-%E7%B6%B2%E7%AB%99-ssl-%E5%AE%89%E5%85%A8%E8%AA%8D%E8%AD%89-36dfeb609fa8
-#產生KEY
-#https://blog.miniasp.com/post/2019/02/25/Creating-Self-signed-Certificate-using-OpenSSL
-#取得授承認的SSL
-#https://certbot.eff.org/instructions?ws=other&os=ubuntufocal
-#如何在 VSCode 設定完整的 .NET Core 建置、發行與部署工作 看第四點
-#https://blog.miniasp.com/post/2019/01/22/Configure-Tasks-and-Launch-in-VSCode-for-NET-Core
-#[SSL 基礎]私有金鑰、CSR 、CRT 與 中繼憑證
-# https://haway.30cm.gg/ssl-key-csr-crt-pem/
