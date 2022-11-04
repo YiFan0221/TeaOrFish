@@ -5,11 +5,15 @@
 ## 此專案專門做為Linebot的接收服務並將需求轉給Server
 
 <br><br />
-### [Environment]
+## [Environment]
 * LINEBOT_POST_TOKEN = {from post token}
 * LINEBOT_RECV_TOKEN = {from post token}
 * CONNECTSTRING = {mongodb connection string}
 * TARGET_SERVER_URL = {http://IP or domain :5000}
+* SSL_PEM = {SSL憑證相對路徑}
+* SSL_KEY = {SSL私鑰相對路徑}
+* TEAORFISH_SERVER_PORT = {4000}
+* YIFANSERV_SERVER_PORT = {5000}
 <br><br />
 # 要點
  1. Heroku雲端URL
