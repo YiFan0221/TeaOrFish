@@ -23,7 +23,7 @@ def requests_GET_Stock_api(input_APIAndPara):
     #用來執行<GET>,並根據mtext 轉發的api
     ###
     ServerURL =TARGET_SERVER_URL+'/Stock'
-    return requests_api(RESTful.POST , ServerURL,input_APIAndPara)
+    return requests_api(RESTful.GET , ServerURL,input_APIAndPara)
         
         
 def requests_api(REST:RESTful , ServerURL:str , input_APIAndPara):    

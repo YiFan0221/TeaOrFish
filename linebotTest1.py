@@ -122,7 +122,7 @@ def handle_message(event):
             Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=StateSt.text))                  
         elif(mtext.isdigit() and len(mtext)>=4):
             input_APIAndPara = '/SearchStock,'+str(mtext)
-            StateSt = requests_GET_Stock_api(input_APIAndPara)                    
+            StateSt = requests_POST_Stock_api(input_APIAndPara)                    
             Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=StateSt.text))                 
   elif(MsgType=="image"):    
       
