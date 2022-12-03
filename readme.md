@@ -16,21 +16,18 @@
 * YIFANSERV_SERVER_PORT = {5000}
 <br><br />
 # 要點
- 1. Heroku雲端URL
-> https://dashboard.heroku.com/apps/teaorfish/logs
-
- 2. LineBotDevelopers URL
+ 1. LineBotDevelopers URL
 > https://developers.line.biz/console/channel/1656189523/messaging-api
 
- 3. 現在有三處可掛
+ 2. 現在有三處可掛
 > https://teaorfish.herokuapp.com/callback
 > https://yfnoip.ddns.net:4000/callback
 > https://yifanserver.teaorfish.com:4000/callback
 
- 4. LineBot 基本開發
+ 3. LineBot 基本開發
 > https://engineering.linecorp.com/zh-hant/blog/line-device-10/
 
- 5. 爬蟲對象來源網站URL
+ 4. 爬蟲對象來源網站URL
 > https://invest.cnyes.com/twstock/TWS/2330
 
 ※通常要改這個 jsx-2214436525 info-lp

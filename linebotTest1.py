@@ -110,20 +110,32 @@ def handle_message(event):
           StateSt = requests_POST_Stock_api(input_APIAndPara)                    
           Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=StateSt.text))     
       else: #功能
+        if(mtext=='台股行情搜尋說明'):
+            responstring = '請輸入股票代號\n ex. 2330'
+            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=responstring))                   
         if(mtext=='我的ID' or mtext=='我的id'):
             Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text='當前傳訊息帳號的id為:'+userId))                   
         elif mtext=='TOP':       
             input_APIAndPara = '/Get_TOP_N_Report,10'
             StateSt = requests_GET_Stock_api(input_APIAndPara)                    
-            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=StateSt.text))     
+            if type(StateSt)==str:
+              Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=StateSt))                 
+            else:
+              Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=StateSt.text))                 
         elif mtext=='TOP20':    
             input_APIAndPara = '/Get_TOP_N_Report,20'
             StateSt = requests_GET_Stock_api(input_APIAndPara)                    
-            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=StateSt.text))                  
+            if type(StateSt)==str:
+              Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=StateSt))                 
+            else:
+              Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=StateSt.text))                 
         elif(mtext.isdigit() and len(mtext)>=4):
             input_APIAndPara = '/SearchStock,'+str(mtext)
             StateSt = requests_POST_Stock_api(input_APIAndPara)                    
-            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=StateSt.text))                 
+            if type(StateSt)==str:
+              Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=StateSt))                 
+            else:
+              Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=StateSt.text))                 
   elif(MsgType=="image"):    
       
       print('[Step]['+message_id+' ***收到圖片***]：')        

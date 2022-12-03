@@ -16,14 +16,15 @@ def requests_POST_Stock_api(input_APIAndPara):
     #用來執行<POST>,並根據mtext 轉發的api
     ###
     ServerURL =TARGET_SERVER_URL+'/Stock'
-    return requests_api(RESTful.POST,ServerURL,input_APIAndPara)
-    
+    rtn =  requests_api(RESTful.POST,ServerURL,input_APIAndPara)
+    return rtn    
 def requests_GET_Stock_api(input_APIAndPara):
     ###
     #用來執行<GET>,並根據mtext 轉發的api
     ###
     ServerURL =TARGET_SERVER_URL+'/Stock'
-    return requests_api(RESTful.GET , ServerURL,input_APIAndPara)
+    rtn = requests_api(RESTful.GET , ServerURL,input_APIAndPara)    
+    return rtn
         
         
 def requests_api(REST:RESTful , ServerURL:str , input_APIAndPara):    
@@ -39,12 +40,24 @@ def requests_api(REST:RESTful , ServerURL:str , input_APIAndPara):
       sendobj = {'text':input_para[1]}        
     
     header = {'Connection':'close',"content-type": "application/json"}
-    
-    if(REST == RESTful.GET):
-      StateSt = requests.get(apiurl, json=sendobj , headers=header, verify=False )  
-    elif(REST == RESTful.POST):
-      StateSt = requests.post(apiurl, json=sendobj , headers=header, verify=False)
-    return StateSt
+    httpcode=200
+    try:
+      if(REST == RESTful.GET):
+        StateSt = requests.get(apiurl, json=sendobj , headers=header, verify=False )  
+      elif(REST == RESTful.POST):
+        StateSt = requests.post(apiurl, json=sendobj , headers=header, verify=False)
+    except requests.exceptions.Timeout:
+      httpcode = 500
+      StateSt = '服務器回應過長，請聯繫開發者'
+    except requests.exceptions.TooManyRedirects:
+      httpcode = 503
+      StateSt = '服務器異常，請聯繫開發者'
+    except Exception:
+      httpcode = 500
+      StateSt = '發生未知錯誤，請聯繫開發者'      
+    if type(StateSt)!=str:      
+      respon = json.loads(StateSt.text)      
+    return respon['result']
             
 status = {
     200:"OK",
