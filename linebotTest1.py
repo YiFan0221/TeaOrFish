@@ -113,8 +113,10 @@ def handle_message(event):
         if(mtext=='台股行情搜尋說明'):
             responstring = '請輸入股票代號\n ex. 2330'
             Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=responstring))                   
-        if(mtext=='我的ID' or mtext=='我的id'):
+        elif(mtext=='我的ID' or mtext=='我的id'):
             Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text='當前傳訊息帳號的id為:'+userId))                   
+        elif mtext=='打招呼':       
+          Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text='Hi, 你好!'))                   
         elif mtext=='TOP':       
             input_APIAndPara = '/Get_TOP_N_Report,10'
             StateSt = requests_GET_Stock_api(input_APIAndPara)                    
