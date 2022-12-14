@@ -120,7 +120,8 @@ def handle_message(event):
             Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text='當前傳訊息帳號的id為:'+userId))                   
         elif mtext=='打招呼':       
           Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text='Hi, 你好!'))                   
-        elif(mtext=='八卦版' or mtext=='西施版' or mtext=='表特版'):                 
+        elif(mtext=='八卦版' or mtext=='西施版' or mtext=='表特版'):        
+            input_APIAndPara=""         
             if(mtext=='八卦版' ):
               input_APIAndPara = '/Get_Gossiping_TOP_N_Report,10'
             elif(mtext=='西施版' ):

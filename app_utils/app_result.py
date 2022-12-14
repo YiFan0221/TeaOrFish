@@ -39,7 +39,7 @@ def requests_GET_Other_api(input_APIAndPara):
     ###
     #用來執行<GET>,並根據mtext 轉發的api
     ###
-    ServerURL =TARGET_SERVER_URL+'/Other/'
+    ServerURL =TARGET_SERVER_URL+'/Other'
     rtn = requests_api(RESTful.GET , ServerURL,input_APIAndPara)    
     return rtn        
         
