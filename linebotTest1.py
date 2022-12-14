@@ -8,7 +8,7 @@ import tempfile
 from flasgger import Swagger
 
 #其他後端function
-from backend_models.picIV       import Pic_Auth
+# from backend_models.picIV       import Pic_Auth
 from app_utils.app_result       import requests_POST_Stock_api,requests_GET_Stock_api
 
 print("[Inital][ENV]")
