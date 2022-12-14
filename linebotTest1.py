@@ -139,38 +139,20 @@ def handle_message(event):
             else:
               Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=StateSt.text))                 
   
-  elif(MsgType=="image"):      
-    if(Mode == 'vision'):    
-      print('[Step]['+message_id+' ***收到圖片***]：')        
-      message_content = Linebot_Post_handle.get_message_content(message_id)
-      # print('[Step]取得檔案')                       
-      img_st="尚未辨識"
-      
-      #region  #因為之前在雲端權限問題，無法以二進位分析，這邊之後要用socket給後端辨識
-      # 方法1
-      #本地路徑 本地絕對路徑
-      # file_path = os.path.abspath(os.path.dirname(__file__)) + "\\" +message_id+".jpg"      
-      # print('[Step]準備複製來源檔案:'+file_path)
-      # with open(file_path, 'wb') as fd:
-      #    for chunk in message_content.iter_content():
-      #        fd.write(chunk)
-      # img_st=Pic_Auth(file_path)        
-      # print('[Step]辨識完畢,刪除暫存') 
-      # Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=img_st))  
-      
-      # 方法2
-      #生成臨時文件 tempfile.NamedTemporaryFile
-      # print('[Step]準備複製來源檔案:')
-      with tempfile.NamedTemporaryFile(suffix='.jpg',delete=False) as tf:
-        for chunk in message_content.iter_content():
-            tf.write(chunk)              
-        file_path = tf.name                
-      img_st=Pic_Auth(file_path)        
-      print('[Step]辨識完畢,刪除暫存')     
-      tf.close()                                
-      os.unlink(tf.name)    
-      Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=img_st))        
-      #endregion #因為之前在雲端權限問題，無法以二進位分析，這邊之後要用socket給後端辨識    
+  # elif(MsgType=="image"):      #CI效能問題，暫時移除OCR功能增加build速度
+  #   if(Mode == 'vision'):    
+  #     print('[Step]['+message_id+' ***收到圖片***]：')        
+  #     message_content = Linebot_Post_handle.get_message_content(message_id)                    
+  #     img_st="尚未辨識"      
+  #     with tempfile.NamedTemporaryFile(suffix='.jpg',delete=False) as tf:
+  #       for chunk in message_content.iter_content():
+  #           tf.write(chunk)              
+  #       file_path = tf.name                
+  #     img_st=Pic_Auth(file_path)        
+  #     print('[Step]辨識完畢,刪除暫存')     
+  #     tf.close()                                
+  #     os.unlink(tf.name)    
+  #     Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=img_st))        
       
 def SwitchSettingMode():
   global Mode
