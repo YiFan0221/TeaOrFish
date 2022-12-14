@@ -107,8 +107,11 @@ def handle_message(event):
       elif mtext[0:9]=='testSpace':
           #這邊要呼叫家裡Server的API
           input_APIAndPara = mtext[9:]
-          StateSt = requests_POST_Stock_api(input_APIAndPara)                    
-          Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=StateSt.text))     
+          StateSt = requests_GET_Other_api(input_APIAndPara)  
+          if type(StateSt)==str:
+            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=StateSt))                 
+          else:                    
+            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=StateSt.text))     
       else: #功能
         if(mtext=='台股行情搜尋說明'):
             responstring = '請輸入股票代號\n ex. 2330'
@@ -117,9 +120,14 @@ def handle_message(event):
             Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text='當前傳訊息帳號的id為:'+userId))                   
         elif mtext=='打招呼':       
           Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text='Hi, 你好!'))                   
-        elif mtext=='八卦':       
-            input_APIAndPara = '/Get_TOP_N_Report,10'
-            StateSt = requests_GET_Other_api(input_APIAndPara)                    
+        elif(mtext=='八卦版' or mtext=='西施版' or mtext=='表特版'):                 
+            if(mtext=='八卦版' ):
+              input_APIAndPara = '/Get_Gossiping_TOP_N_Report,10'
+            elif(mtext=='西施版' ):
+              input_APIAndPara = '/Get_Sex_TOP_N_Report,10'
+            elif(mtext=='表特版' ):
+              input_APIAndPara = '/Get_Beauty_TOP_N_Report,10'            
+            StateSt = requests_GET_Other_api(input_APIAndPara)                                
             if type(StateSt)==str:
               Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=StateSt))                 
             else:
