@@ -9,7 +9,7 @@ from flasgger import Swagger
 
 #其他後端function
 # from backend_models.picIV       import Pic_Auth
-from app_utils.app_result       import requests_POST_Stock_api,requests_GET_Stock_api
+from app_utils.app_result       import requests_POST_Stock_api,requests_GET_Stock_api,requests_GET_Other_api,requests_POST_Other_api
 
 print("[Inital][ENV]")
 LINEBOT_POST_TOKEN  = os.environ.get('LINEBOT_POST_TOKEN')
@@ -117,6 +117,13 @@ def handle_message(event):
             Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text='當前傳訊息帳號的id為:'+userId))                   
         elif mtext=='打招呼':       
           Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text='Hi, 你好!'))                   
+        elif mtext=='八卦':       
+            input_APIAndPara = '/Get_TOP_N_Report,10'
+            StateSt = requests_GET_Other_api(input_APIAndPara)                    
+            if type(StateSt)==str:
+              Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=StateSt))                 
+            else:
+              Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=StateSt.text))                   
         elif mtext=='TOP':       
             input_APIAndPara = '/Get_TOP_N_Report,10'
             StateSt = requests_GET_Stock_api(input_APIAndPara)                    

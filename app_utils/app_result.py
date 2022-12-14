@@ -18,6 +18,7 @@ def requests_POST_Stock_api(input_APIAndPara):
     ServerURL =TARGET_SERVER_URL+'/Stock'
     rtn =  requests_api(RESTful.POST,ServerURL,input_APIAndPara)
     return rtn    
+  
 def requests_GET_Stock_api(input_APIAndPara):
     ###
     #用來執行<GET>,並根據mtext 轉發的api
@@ -25,7 +26,22 @@ def requests_GET_Stock_api(input_APIAndPara):
     ServerURL =TARGET_SERVER_URL+'/Stock'
     rtn = requests_api(RESTful.GET , ServerURL,input_APIAndPara)    
     return rtn
-        
+
+def requests_POST_Other_api(input_APIAndPara):
+    ###
+    #用來執行<POST>,並根據mtext 轉發的api
+    ###
+    ServerURL =TARGET_SERVER_URL+'/Other'
+    rtn =  requests_api(RESTful.POST,ServerURL,input_APIAndPara)
+    return rtn    
+  
+def requests_GET_Other_api(input_APIAndPara):
+    ###
+    #用來執行<GET>,並根據mtext 轉發的api
+    ###
+    ServerURL =TARGET_SERVER_URL+'/Other'
+    rtn = requests_api(RESTful.GET , ServerURL,input_APIAndPara)    
+    return rtn        
         
 def requests_api(REST:RESTful , ServerURL:str , input_APIAndPara):    
     #ex. 
