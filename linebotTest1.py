@@ -56,6 +56,7 @@ class opaibotPara:
   model = "text-davinci-003"
   temperature = 0.0
   maximumlength = 100
+  maxtoken = 200
       
 @app.route("/")
 def home():
@@ -107,29 +108,53 @@ def handle_message(event):
       print('['+message_id+' ***收到文字***]：')
       
       #先檢查是不是設定模式指令
-      if mtext=='switch':                
-          Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=SwitchSettingMode()))     
+      if mtext=='switch':        
+        rtnstr=SwitchSettingMode()
+        if(CheckSettingMode()):
+          rtnstr=rtnstr+str("\n說明:可使用\n"
+          +"【 設定模型 】\n"
+          +"【 設定溫度 】\n"
+          +"【 設定最大長度 】\n"
+          +"【 設定回應長度 】\n"
+          +"來進行參數設置\n"
+          +"並可透過 【AI 提問】來進行問答")
+
+        Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))     
       elif mtext=='switcM':
-          Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=ShowMode()))     
+        Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=ShowMode()))     
       #檢查是否為設定模式
       
       elif(CheckSettingMode()==True):
         #擷取要設定的屬性
-        if 'model' in mtext:
-          para = mtext[len('model')+1:]
+        if '設定模型' in mtext:
+          para = mtext[len('設定模型')+1:]
           opaibotPara.model = para 
           rtnstr='opaibotPara.model: '+str(opaibotPara.model)
           Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))     
-        elif 'temperature' in mtext:
-          para =  mtext[len('temperature')+1:]
+        elif '設定溫度' in mtext:
+          para =  mtext[len('設定溫度')+1:]
           opaibotPara.temperature = float(para)
           rtnstr='opaibotPara.temperature: '+str(opaibotPara.temperature)
           Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))     
-        elif 'maximumlength' in mtext:
-          para = mtext[len('maximumlength')+1:]
+        elif '設定最大長度' in mtext:
+          para = mtext[len('設定最大長度')+1:]
           opaibotPara.maximumlength = int(para)
           rtnstr='opaibotPara.maximumlength: '+str(opaibotPara.maximumlength)
           Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))               
+        elif '設定回應長度' in mtext:
+          para = mtext[len('設定回應長度')+1:]
+          opaibotPara.maxtoken = int(para)
+          rtnstr='opaibotPara.maxtoken: '+str(opaibotPara.maxtoken)
+          Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))               
+        elif mtext[0:3]=='AI ':   
+          input_Para = mtext[3:]                 
+          response = openai.Completion.create(
+          model= opaibotPara.model ,
+          prompt=input_Para,
+          max_tokens= opaibotPara.maxtoken, 
+          temperature= opaibotPara.temperature)
+          Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response.choices[0].text.lstrip()))                      
+                                    
       else:#功能型指令          
         if mtext[0:10]=='testSpace=':
             #這邊要呼叫家裡Server的API
@@ -139,15 +164,7 @@ def handle_message(event):
               Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response))                 
             else:                    
               Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response.text))   
-        elif mtext[0:7]=='prompt=':   
-            input_Para = mtext[7:]                 
-            response = openai.Completion.create(
-            model= opaibotPara.model ,
-            prompt=input_Para,
-            temperature= opaibotPara.temperature)
-            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response.choices[0].text))                      
-              
-            
+                          
         else: #功能
           if(mtext=='台股行情搜尋說明'):
               responstring = '請輸入股票代號\n ex. 2330'
@@ -209,15 +226,15 @@ def handle_message(event):
 def SwitchSettingMode():
   global Mode
   oldMode = Mode
-  if(Mode == 'Setting Mode'):
+  if(Mode == 'AI Mode'):
     Mode = 'Normal Mode'
   else :
-    Mode = 'Setting Mode'
+    Mode = 'AI Mode'
   return '模式:'+oldMode+' 更換為:'+Mode
     
 def CheckSettingMode():
   global Mode
-  if(Mode == 'Setting Mode'):
+  if(Mode == 'AI Mode'):
     return True
   else :
     return False
