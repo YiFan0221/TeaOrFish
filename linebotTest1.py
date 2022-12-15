@@ -57,17 +57,16 @@ context.load_cert_chain(SSL_PEM,SSL_KEY)
 class opaibotPara:
   model = "text-davinci-003"
   temperature = 0.0
-  maximumlength = 100
   maxtoken = 200
       
 print("[Inital][MongoDB]")
 Clientinit()
       
 str_doc = str("說明:可使用\n"
-          +"【 設定模型 】\n"
-          +"【 設定溫度 】\n"
-          +"【 設定最大長度 】\n"
-          +"【 設定回應長度 】\n"
+          +"【 設定模型:】ex.text-davinci-003 \n"
+          +"【 設定溫度: 】Float: 0~1\n"
+          +"【 設定回應長度: 】int:0~2048\n"
+          +"【 現在數值 】\n"
           +"來進行參數設置\n"
           +"並可透過 【AI 提問】來進行問答")
 
@@ -135,7 +134,13 @@ def handle_message(event):
         if '使用說明' in mtext:
           rtnstr=str_doc
           Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))    
-        if '設定模型' in mtext:
+        elif '現在數值' in mtext:
+          # https://beta.openai.com/docs/api-reference/completions/create
+          rtnstr=str('Model: \t'+str(opaibotPara.model)
+          +'\nTemperature: \t'+str(opaibotPara.temperature)
+          +'\nMaxtokens: \t'+str(opaibotPara.maxtoken))
+          Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))              
+        elif '設定模型' in mtext:
           para = mtext[len('設定模型')+1:]
           opaibotPara.model = para 
           rtnstr='opaibotPara.model: '+str(opaibotPara.model)
@@ -144,12 +149,7 @@ def handle_message(event):
           para =  mtext[len('設定溫度')+1:]
           opaibotPara.temperature = float(para)
           rtnstr='opaibotPara.temperature: '+str(opaibotPara.temperature)
-          Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))     
-        elif '設定最大長度' in mtext:
-          para = mtext[len('設定最大長度')+1:]
-          opaibotPara.maximumlength = int(para)
-          rtnstr='opaibotPara.maximumlength: '+str(opaibotPara.maximumlength)
-          Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))               
+          Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))                  
         elif '設定回應長度' in mtext:
           para = mtext[len('設定回應長度')+1:]
           opaibotPara.maxtoken = int(para)
