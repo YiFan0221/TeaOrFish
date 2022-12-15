@@ -4,6 +4,7 @@ line-bot-sdk==1.19.0
 APScheduler==3.6.1
 flasgger==0.9.5
 flask_cors
+pymongo[srv] ==4.2.0
 ###########圖文辨識###########
 #pillow==8.3.1
 #pytesseract==0.3.8

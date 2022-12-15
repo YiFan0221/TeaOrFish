@@ -3,6 +3,7 @@ from flask_cors import CORS
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import * #MessageEvent,TextMessage,ImageSendMessage
+from MongoDB.FuncMongodb        import *
 import os
 import tempfile
 from flasgger import Swagger
@@ -14,6 +15,7 @@ from app_utils.app_result       import requests_POST_Stock_api,requests_GET_Stoc
 print("[Inital][ENV]")
 LINEBOT_POST_TOKEN  = os.environ.get('LINEBOT_POST_TOKEN')
 LINEBOT_RECV_TOKEN  = os.environ.get('LINEBOT_RECV_TOKEN')
+CONNECTSTRING       = os.environ.get('CONNECTSTRING')
 TARGET_SERVER_URL   = os.environ.get('TARGET_SERVER_URL')
 SSL_PEM             = os.environ.get('SSL_PEM')
 SSL_KEY             = os.environ.get('SSL_KEY')
@@ -58,6 +60,17 @@ class opaibotPara:
   maximumlength = 100
   maxtoken = 200
       
+print("[Inital][MongoDB]")
+Clientinit()
+      
+str_doc = str("說明:可使用\n"
+          +"【 設定模型 】\n"
+          +"【 設定溫度 】\n"
+          +"【 設定最大長度 】\n"
+          +"【 設定回應長度 】\n"
+          +"來進行參數設置\n"
+          +"並可透過 【AI 提問】來進行問答")
+
 @app.route("/")
 def home():
   return render_template("home.html")
@@ -111,14 +124,7 @@ def handle_message(event):
       if mtext=='switch':        
         rtnstr=SwitchSettingMode()
         if(CheckSettingMode()):
-          rtnstr=rtnstr+str("\n說明:可使用\n"
-          +"【 設定模型 】\n"
-          +"【 設定溫度 】\n"
-          +"【 設定最大長度 】\n"
-          +"【 設定回應長度 】\n"
-          +"來進行參數設置\n"
-          +"並可透過 【AI 提問】來進行問答")
-
+          rtnstr=rtnstr+"\n"+str_doc
         Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))     
       elif mtext=='switcM':
         Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=ShowMode()))     
@@ -126,6 +132,9 @@ def handle_message(event):
       
       elif(CheckSettingMode()==True):
         #擷取要設定的屬性
+        if '使用說明' in mtext:
+          rtnstr=str_doc
+          Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))    
         if '設定模型' in mtext:
           para = mtext[len('設定模型')+1:]
           opaibotPara.model = para 
@@ -153,7 +162,10 @@ def handle_message(event):
           prompt=input_Para,
           max_tokens= opaibotPara.maxtoken, 
           temperature= opaibotPara.temperature)
-          Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response.choices[0].text.lstrip()))                      
+          rtnstr = response.choices[0].text.lstrip()          
+          if(rtnstr!=None):
+            Insert_AIQuestion("Question:"+input_Para+"\n Answer:"+rtnstr)
+          Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))                      
                                     
       else:#功能型指令          
         if mtext[0:10]=='testSpace=':
