@@ -44,22 +44,34 @@ def Clientinit():
     client = pymongo.MongoClient(conn_str, serverSelectionTimeoutMS=5000)
     try:
         print(client.server_info())
+        db = client['APILOG']
     except Exception:
         print("Unable to connect to the server.")
+        print(Exception)
         
-    db = client['APILOG']
+        db = None
+        
+    
     
 def getDataBase():
     global db
     if(db==None):
-        db = client['APILOG']
+        if(client['APILOG']!=None):
+            db = client['APILOG']
+            return db    
+        else:
+            return None
     else:
         return db
     
 def getConnectInfo(Collections:InfoType):
     #DataBase
     global db    
-    db = getDataBase()
+    
+    if(getDataBase()!=None):
+        db = getDataBase()
+    else:
+        return None        
     #Collections
     collections = db[Collections.value]    
     return collections
@@ -84,14 +96,19 @@ def Insert_APILog_PostRank(text:str):
 def Insert_APILog_StockSearchlog(text:str):
     return Insert_unit_nonTags(InfoType.APILog_StockSearchlog,text)    
     
+def Insert_unit_nonTags(Collections:InfoType,text:str):
+    return Insert_unit(Collections,text,None)
+
 def Insert_unit(Collections:InfoType,text:str,Tags:tuple):
     #插入資料庫的根本函式
     
     #connect     
     collections = getConnectInfo(Collections)
+    if(collections==None):
+        return False
 
     post = {
-    "TypeName":Collections.value,
+    "TypeName": Collections.value,
     "text": text,
     "tags": [Collections.value, text],
     "date": datetime.datetime.utcnow(),
@@ -101,22 +118,26 @@ def Insert_unit(Collections:InfoType,text:str,Tags:tuple):
     # print("post_id:"+str(post_id))
     return post_id
 
-def Insert_unit_nonTags(Collections:InfoType,text:str):
-    return Insert_unit(Collections,text,None)
-
 #endregion ------ Insert ------
 
 #region ------ Find ------
 def Find_one_byid(Collections:InfoType,post_id):
     #connect     
     collections = getConnectInfo(Collections)
+    if(collections==None):
+        return False
     pprint.pprint(collections.find_one({"_id": post_id}))
+    return True
         
 def Find(Collections:InfoType,SelectItemName:str,SelectItem:str):
     #connect     
     collections = getConnectInfo(Collections)
+    if(collections==None):
+        return False
+    
     for post in collections.find({SelectItemName: SelectItem}):
         pprint.pprint(post)      
+    return True
         
 #endregion ------ Find ------        
 
@@ -124,15 +145,18 @@ def Find(Collections:InfoType,SelectItemName:str,SelectItem:str):
 def delete(Collections:InfoType,SelectItemName:str,SelectItem:str):
     #connect     
     collections = getConnectInfo(Collections)
+    if(collections==None):
+        return False
+    
     query = {SelectItemName: SelectItem}
     d = collections.delete_many(query)
     print(d.deleted_count, " documents deleted !!")
-    
+    return True
     
         
 #endregion ------ Delete ------
 
 Clientinit()
-id=Insert_unit_nonTags(InfoType.SysLog,"System On.")
-Find(InfoType.APILog_Linebot,"_id",id)#display 
+# id=Insert_unit_nonTags(InfoType.SysLog,"System On.")
+# Find(InfoType.APILog_Linebot,"_id",id)#display 
 # delete(InfoType.APILog_Line,"TypeName",InfoType.APILog_Line.value)

@@ -64,7 +64,7 @@ Clientinit()
       
 str_doc = str(
           "說明:可使用下列參數對AI進型設置\n"
-          +"【 設定模型:】指定使用的AI模型ex.text-davinci-003 \n"
+          # +"【 設定模型:】指定使用的AI模型ex.text-davinci-003 \n"
           +"【 設定溫度: 】設定AI所擁有的情緒 Float: 0~1\n"
           +"【 設定回應長度: 】設定最多能回應的字節 int:0~2048\n"
           +"【 現在數值 】\n"          
@@ -73,7 +73,8 @@ str_doc = str(
           +"【八卦版】 回傳最新十篇八卦版標題與連結\n"
           +"【西施版】 回傳最新十篇西施版標題與連結\n"
           +"【表特版】 回傳最新十篇表特版標題與連結\n"
-          +"【TOP】    回傳最新十篇股票版標題與連結\n"
+          +"【TOP】   回傳最新十篇股票版標題與連結\n"
+          +"【s /{2330或股票代號/}】回傳即時傳回的股票行情價格\n"
           )
 
 @app.route("/")
@@ -134,10 +135,10 @@ def handle_message(event):
       elif mtext=='switcM':
         Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=ShowMode()))     
 
-      elif '使用說明' in mtext:
+      elif ('使用說明' or '說明') in mtext:
         rtnstr=str_doc
         Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))    
-      elif '現在數值' in mtext:
+      elif ('使用說明' or '設定值') in mtext:
         # https://beta.openai.com/docs/api-reference/completions/create
         rtnstr=str('Model: \t'+str(opaibotPara.model)
         +'\nTemperature: \t'+str(opaibotPara.temperature)
@@ -148,7 +149,7 @@ def handle_message(event):
         opaibotPara.model = para 
         rtnstr='opaibotPara.model: '+str(opaibotPara.model)
         Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))     
-      elif '設定溫度' in mtext:
+      elif ('設定溫度' or '情緒設定') in mtext:
         para =  mtext[len('設定溫度')+1:]
         opaibotPara.temperature = float(para)
         rtnstr='opaibotPara.temperature: '+str(opaibotPara.temperature)
@@ -158,7 +159,7 @@ def handle_message(event):
         opaibotPara.maxtoken = int(para)
         rtnstr='opaibotPara.maxtoken: '+str(opaibotPara.maxtoken)
         Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))               
-      elif mtext[0:3]=='AI ':   
+      elif mtext.upper()[0:3]=='AI ':   
         if(CheckSettingMode()==True):
           input_Para = mtext[3:]                 
           response = openai.Completion.create(
@@ -215,8 +216,18 @@ def handle_message(event):
             Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response))                 
           else:
             Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response.text))                 
-      elif(mtext.isdigit() and len(mtext)>=4):
-          input_APIAndPara = '/SearchStock,'+str(mtext)
+      elif( mtext.upper()[0:2]=='S 'or
+            mtext.upper()[0:6]=='STOCK:' or
+            mtext.upper()[0:3]=='股票 '            
+          ):
+          stockstr_index=0
+          if(mtext.upper()[0:2]=='S '):
+            stockstr_index = 2
+          elif(mtext.upper()[0:6]=='STOCK:'):
+            stockstr_index = 6
+          elif(mtext.upper()[0:3]=='股票 '):
+            stockstr_index = 3
+          input_APIAndPara = '/SearchStock,'+str(mtext[stockstr_index:])
           response = requests_POST_Stock_api(input_APIAndPara)                    
           if type(response)==str:
             Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response))                 
