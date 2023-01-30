@@ -100,6 +100,7 @@ def Insert_unit_nonTags(Collections:InfoType,text:str):
     return Insert_unit(Collections,text,None)
 
 def Insert_unit(Collections:InfoType,text:str,Tags:tuple):
+    return False
     #插入資料庫的根本函式
     
     #connect     
