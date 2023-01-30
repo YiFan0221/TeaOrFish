@@ -31,6 +31,8 @@ def ImportUserInfoByENV():
     return conn_str
 
 def Clientinit():
+    return False
+
     global username
     global password
     global client
@@ -54,6 +56,8 @@ def Clientinit():
     
     
 def getDataBase():
+    return False
+
     global db
     if(db==None):
         if(client['APILOG']!=None):
@@ -65,6 +69,8 @@ def getDataBase():
         return db
     
 def getConnectInfo(Collections:InfoType):
+    return False
+
     #DataBase
     global db    
     
@@ -123,6 +129,8 @@ def Insert_unit(Collections:InfoType,text:str,Tags:tuple):
 
 #region ------ Find ------
 def Find_one_byid(Collections:InfoType,post_id):
+    return False
+
     #connect     
     collections = getConnectInfo(Collections)
     if(collections==None):
@@ -131,6 +139,8 @@ def Find_one_byid(Collections:InfoType,post_id):
     return True
         
 def Find(Collections:InfoType,SelectItemName:str,SelectItem:str):
+    return False
+
     #connect     
     collections = getConnectInfo(Collections)
     if(collections==None):
@@ -144,6 +154,8 @@ def Find(Collections:InfoType,SelectItemName:str,SelectItem:str):
 
 #region ------ Delete ------
 def delete(Collections:InfoType,SelectItemName:str,SelectItem:str):
+    return False
+
     #connect     
     collections = getConnectInfo(Collections)
     if(collections==None):
