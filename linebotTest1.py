@@ -135,10 +135,10 @@ def handle_message(event):
       elif mtext=='switcM':
         Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=ShowMode()))     
 
-      elif ('使用說明' or '說明') in mtext:
+      elif ('使用說明'in mtext) or ('說明'in mtext) :
         rtnstr=str_doc
         Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))    
-      elif ('使用說明' or '設定值') in mtext:
+      elif ('現在數值'in mtext) or ('設定值'in mtext):
         # https://beta.openai.com/docs/api-reference/completions/create
         rtnstr=str('Model: \t'+str(opaibotPara.model)
         +'\nTemperature: \t'+str(opaibotPara.temperature)
@@ -149,7 +149,7 @@ def handle_message(event):
         opaibotPara.model = para 
         rtnstr='opaibotPara.model: '+str(opaibotPara.model)
         Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))     
-      elif ('設定溫度' or '情緒設定') in mtext:
+      elif ('設定溫度'in mtext) or ('設定情緒'in mtext):
         para =  mtext[len('設定溫度')+1:]
         opaibotPara.temperature = float(para)
         rtnstr='opaibotPara.temperature: '+str(opaibotPara.temperature)
