@@ -13,10 +13,12 @@ EXTENSIONS = [
     Extension("backend_models/*", ["backend_models/*.py"]),
     Extension("controller/*", ["controller/*.py"]),
     Extension("linebotTest1", ["linebotTest1.py"]),
+    Extension("MongoDB/*", ["MongoDB/*.py"]),
+    
 ]
 
 setup(
     name="Web backend",
-    ext_modules=cythonize((EXTENSIONS), compiler_directives={'language_level' : "3"})
+    ext_modules=cythonize(EXTENSIONS)
 )
 
