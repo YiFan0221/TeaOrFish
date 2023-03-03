@@ -6,6 +6,7 @@ SSL_AWS/fullchain1.pem
 SSL_AWS/privkey1.pem
 SSL_AWS/chain1.pem
 *.c
+*.o
 *.so
 
 SSL_YiFanServer/yfnoip_ddns_net.pem
