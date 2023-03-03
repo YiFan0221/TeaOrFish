@@ -12,6 +12,7 @@ EXTENSIONS = [
     Extension("app_utils/*", ["app_utils/*.py"]),
     Extension("backend_models/*", ["backend_models/*.py"]),
     Extension("controller/*", ["controller/*.py"]),
+    Extension("linebotTest1", ["linebotTest1.py"]),
 ]
 
 setup(
