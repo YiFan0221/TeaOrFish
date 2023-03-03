@@ -98,14 +98,14 @@ default_description = {
 
     
 def result_json(code, data = {}, description = ''):
-	description = default_description.get(code) if description == '' else description
-	response = json.dumps({
+  description = default_description.get(code) if description == '' else description
+  response = json.dumps({
 		"code": code,
 		"status": status.get(code),
 		"result": data,
 		"description": description
 	}, default=lambda o: '<not serializable>')
 
-	return response, code, {'Content-Type': 'application/json'}
+  return response, code, {'Content-Type': 'application/json'}
 
 
