@@ -17,10 +17,16 @@
             "internalConsoleOptions": "neverOpen"
         },
         {
-            "name": ".NET Core Attach",
+            "name": "Python: linebot-FLASK專案-Release版",
             "type": "python",
-            "request": "attach",
-            "processId": "${command:pickProcess}"
+            "request": "launch",
+            // "preLaunchTask": "build",
+            "program": "${workspaceFolder}/build/temp.linux-x86_64-3.8/linebotTest1.py", 
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "stopAtEntry": false,
+            "internalConsoleOptions": "neverOpen"
         },
         {
             "name": "Python: linebot-FLASK專案",

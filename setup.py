@@ -15,7 +15,7 @@ EXTENSIONS = [
     Extension("controller/*", ["controller/*.py"]),
     Extension("MongoDB/*", ["MongoDB/*.py"]),
     Extension("linebotTest1", ["linebotTest1.py"]),
-    Extension("app_plugin.py", ["app_plugin.py"]),
+    Extension("app_plugin", ["app_plugin.py"]),
         
 ]
 
