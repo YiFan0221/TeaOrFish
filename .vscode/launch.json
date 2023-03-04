@@ -21,9 +21,9 @@
             "type": "python",
             "request": "launch",
             // "preLaunchTask": "build",
-            "program": "${workspaceFolder}/build/temp.linux-x86_64-3.8/linebotTest1.py", 
+            "program": "${workspaceFolder}/build/lib.linux-x86_64-3.8/linebotTest1.py", 
             "args": [],
-            "cwd": "${workspaceFolder}",
+            "cwd": "${workspaceFolder}/build/lib.linux-x86_64-3.8/",
             "console": "integratedTerminal",
             "stopAtEntry": false,
             "internalConsoleOptions": "neverOpen"
