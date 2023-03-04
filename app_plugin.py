@@ -1,16 +1,14 @@
-from flask import Flask, request, render_template ,abort
-from flask_cors import CORS
-from linebot import LineBotApi, WebhookHandler
-from linebot.exceptions import InvalidSignatureError
-from linebot.models import * #MessageEvent,TextMessage,ImageSendMessage
-from MongoDB.FuncMongodb        import *
+from flask                import Flask, request, render_template ,abort
+from flask_cors           import CORS
+from linebot              import LineBotApi, WebhookHandler
+from linebot.exceptions   import InvalidSignatureError
+from linebot.models       import * #MessageEvent,TextMessage,ImageSendMessage
+import MongoDB.FuncMongodb as mongo
+import app_utils.app_result as ap
+from flasgger             import Swagger
+import openai
 import os
 import tempfile
-from flasgger import Swagger
-import openai
-#其他後端function
-# from backend_models.picIV       import Pic_Auth
-from app_utils.app_result       import requests_POST_Stock_api,requests_GET_Stock_api,requests_GET_Other_api,requests_POST_Other_api
 
 print("[Inital][ENV]")
 LINEBOT_POST_TOKEN  = os.environ.get('LINEBOT_POST_TOKEN')
@@ -60,7 +58,7 @@ class opaibotPara:
   maxtoken = 200
       
 print("[Inital][MongoDB]")
-Clientinit()
+mongo.Clientinit()
       
 str_doc = str(
           "說明:可使用下列參數對AI進型設置\n"
@@ -169,7 +167,7 @@ def handle_message(event):
           temperature= opaibotPara.temperature)
           rtnstr = response.choices[0].text.lstrip()          
           if(rtnstr!=None):
-            Insert_AIQuestion("Question:"+input_Para+"\n Answer:"+rtnstr)
+            ap.Insert_AIQuestion("Question:"+input_Para+"\n Answer:"+rtnstr)
           Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))                      
                                     
          
@@ -177,7 +175,7 @@ def handle_message(event):
       elif mtext[0:10]=='testSpace=':
           #這邊要呼叫家裡Server的API
           input_APIAndPara = mtext[10:]
-          response = requests_GET_Other_api(input_APIAndPara)  
+          response = ap.requests_GET_Other_api(input_APIAndPara)  
           if type(response)==str:
             Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response))                 
           else:                    
@@ -197,21 +195,21 @@ def handle_message(event):
             input_APIAndPara = '/Get_Sex_TOP_N_Report,10'
           elif(mtext=='表特版' ):
             input_APIAndPara = '/Get_Beauty_TOP_N_Report,10'            
-          response = requests_GET_Other_api(input_APIAndPara)                                
+          response = ap.requests_GET_Other_api(input_APIAndPara)                                
           if type(response)==str:
             Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response))                 
           else:
             Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response.text))                   
       elif mtext=='TOP':       
           input_APIAndPara = '/Get_TOP_N_Report,10'
-          response = requests_GET_Stock_api(input_APIAndPara)                    
+          response = ap.requests_GET_Stock_api(input_APIAndPara)                    
           if type(response)==str:
             Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response))                 
           else:
             Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response.text))                 
       elif mtext=='TOP20':    
           input_APIAndPara = '/Get_TOP_N_Report,20'
-          response = requests_GET_Stock_api(input_APIAndPara)                    
+          response = ap.requests_GET_Stock_api(input_APIAndPara)                    
           if type(response)==str:
             Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response))                 
           else:
@@ -228,7 +226,7 @@ def handle_message(event):
           elif(mtext.upper()[0:3]=='股票 '):
             stockstr_index = 3
           input_APIAndPara = '/SearchStock,'+str(mtext[stockstr_index:])
-          response = requests_POST_Stock_api(input_APIAndPara)                    
+          response = ap.requests_POST_Stock_api(input_APIAndPara)                    
           if type(response)==str:
             Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response))                 
           else:
