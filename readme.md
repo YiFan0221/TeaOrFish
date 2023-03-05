@@ -45,7 +45,14 @@ http://jianiau.blogspot.com/2015/07/openssl-generate-csr.html
 ### 安裝Cerbot
 > sudo snap install --classic certbot
 > 
+
+### venv啟用關閉
+#### 啟用
+> source ./venv/bin/activate
+#### 關閉
+> deactivate
 <br><br />
+
 
 Docker 相關說明
 =============
