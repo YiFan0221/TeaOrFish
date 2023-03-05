@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 # encoding: utf8
 
-from distutils.core import setup
-from distutils.extension import Extension
+from distutils.core import setup,Extension
 from Cython.Build import cythonize
 
 EXTENSIONS = [
@@ -14,7 +13,6 @@ EXTENSIONS = [
 ]
 
 setup(
-    name="Web backend",
     ext_modules=cythonize(EXTENSIONS)
 )
 
