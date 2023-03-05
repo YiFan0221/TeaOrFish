@@ -53,6 +53,10 @@ http://jianiau.blogspot.com/2015/07/openssl-generate-csr.html
 > deactivate
 <br><br />
 
+### Release 加密版本
+#### 於 TeaOrFish第一層執行
+>> ./Release_Build/build_release_so.sh   
+#### 即可到 ../lib/TeaOrFish 獲得.so版本專案
 
 Docker 相關說明
 =============

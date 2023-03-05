@@ -1,6 +1,5 @@
 FROM python:3.8-slim as build 
 
-
 COPY . /
 RUN pip install --no-cache-dir -r requirements.txt
 # RUN apt-get update \
