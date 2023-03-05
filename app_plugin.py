@@ -167,7 +167,7 @@ def handle_message(event):
           temperature= opaibotPara.temperature)
           rtnstr = response.choices[0].text.lstrip()          
           if(rtnstr!=None):
-            ap.Insert_AIQuestion("Question:"+input_Para+"\n Answer:"+rtnstr)
+            mongo.Insert_AIQuestion("Question:"+input_Para+"\n Answer:"+rtnstr)
           Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))                      
                                     
          

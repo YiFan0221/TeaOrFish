@@ -5,7 +5,7 @@ SSL_AWS/cert1.pem
 SSL_AWS/fullchain1.pem
 SSL_AWS/privkey1.pem
 SSL_AWS/chain1.pem
-
+TeaOrFish/
 
 SSL_YiFanServer/yfnoip_ddns_net.pem
 SSL_YiFanServer/yfnoip_ddns_net.pem-chain
