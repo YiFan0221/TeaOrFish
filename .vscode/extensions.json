@@ -1,5 +1,7 @@
 {
     "recommendations": [
-        "ms-python.python"
+        "eamodio.gitlens",
+        "donjayamanne.githistory",
+        "mhutchie.git-graph"
     ]
 }

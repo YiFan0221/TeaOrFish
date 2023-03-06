@@ -1,5 +1,6 @@
 venv
 .env
+.
 ssl.conf
 SSL_AWS/cert1.pem
 SSL_AWS/fullchain1.pem

@@ -1,5 +1,6 @@
 workflows
-.vscode
+.vscode/
+.git/
 指令筆記.txt
 範例圖片.png
 環境安裝.bat
@@ -10,3 +11,7 @@ bat_ngrok.bat
 SSL_AWS/
 SSL_YiFanServer/
 .env
+docker-compose.yml
+dockerfile
+ngrok.exe
+runtime.txt
