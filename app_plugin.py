@@ -9,7 +9,7 @@ import os
 import time
 from apscheduler.schedulers.background import BackgroundScheduler
 
-dt_Access = datetime(1,1,1,0,0,0) #不限制就是 None #限制格式 datetime(2023,3,8,23,42,30) 
+dt_Access = datetime(2023,3,20,0,0,0) #不限制就是 None #限制格式 datetime(2023,3,8,23,42,30) 
 
 def checkAuthorization():
   dt_now = datetime.now()
