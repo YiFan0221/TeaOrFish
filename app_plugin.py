@@ -4,8 +4,6 @@ from linebot              import LineBotApi, WebhookHandler
 from linebot.exceptions   import InvalidSignatureError
 from linebot.models       import * #MessageEvent,TextMessage,ImageSendMessage
 from datetime import datetime
-import app_utils.app_result as ap
-from flasgger             import Swagger
 import openai
 import os
 import time
@@ -37,15 +35,12 @@ loop_checkAuthorization()
 print("[Inital][ENV]")
 LINEBOT_POST_TOKEN  = os.environ.get('LINEBOT_POST_TOKEN')
 LINEBOT_RECV_TOKEN  = os.environ.get('LINEBOT_RECV_TOKEN')
-CONNECTSTRING       = os.environ.get('CONNECTSTRING')
-TARGET_SERVER_URL   = os.environ.get('TARGET_SERVER_URL')
 SSL_PEM             = os.environ.get('SSL_PEM')
 SSL_KEY             = os.environ.get('SSL_KEY')
 SERVER_PORT         = os.environ.get('TEAORFISH_SERVER_PORT')
 openai.api_key      = os.getenv("OPENAI_API_KEY")
 
 print("ENV:LINEBOT_POST_TOKEN : "+LINEBOT_POST_TOKEN )
-print("ENV:TARGET_SERVER_URL  : "+TARGET_SERVER_URL )
 print("ENV:LINEBOT_RECV_TOKEN : "+LINEBOT_RECV_TOKEN )
 print("ENV:SERVER_PORT        : "+str(SERVER_PORT) )
 print("ENV:SECRETS_SSL_PEM    : "+str( os.path.exists("/run/secrets/SSL_PEM") ))
