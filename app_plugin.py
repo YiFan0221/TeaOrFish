@@ -3,13 +3,37 @@ from flask_cors           import CORS
 from linebot              import LineBotApi, WebhookHandler
 from linebot.exceptions   import InvalidSignatureError
 from linebot.models       import * #MessageEvent,TextMessage,ImageSendMessage
+from datetime import datetime
 import MongoDB.FuncMongodb as mongo
 import app_utils.app_result as ap
 from flasgger             import Swagger
 import openai
 import os
-import tempfile
+import time
+from apscheduler.schedulers.background import BackgroundScheduler
 
+dt_Access = datetime(0,0,0,0,0,0) #不限制就是 None #限制格式 datetime(2023,3,8,23,42,30) 
+
+def checkAuthorization():
+  dt_now = datetime.now()
+  st_now = dt_now.strftime("%Y-%m-%d %H:%M:%S %p")
+  
+  if(dt_now > dt_Access and dt_Access!=datetime(0,0,0,0,0,0)):
+    print("Authorization:Failed")
+    os._exit()
+  else:
+    return True
+
+def loop_checkAuthorization():
+  scheduler = BackgroundScheduler(timezone="Asia/Taipei")
+  scheduler.add_job(checkAuthorization, 'interval', hours=1)
+  scheduler.start()
+  
+  
+print("Check Authorization.")
+if(checkAuthorization()):
+  print("Authorization:PASS")
+loop_checkAuthorization()
 print("[Inital][ENV]")
 LINEBOT_POST_TOKEN  = os.environ.get('LINEBOT_POST_TOKEN')
 LINEBOT_RECV_TOKEN  = os.environ.get('LINEBOT_RECV_TOKEN')
