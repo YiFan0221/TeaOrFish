@@ -6,10 +6,7 @@ from Cython.Build import cythonize
 
 EXTENSIONS = [
     Extension("app_plugin", ["app_plugin.py"]),
-    Extension("app_utils/*", ["app_utils/*.py"]),
-    Extension("backend_models/*", ["backend_models/*.py"]),
-    Extension("controller/*", ["controller/*.py"]),
-    Extension("MongoDB/*", ["MongoDB/*.py"]),        
+    Extension("app_utils/*", ["app_utils/*.py"]),  
 ]
 
 setup(
