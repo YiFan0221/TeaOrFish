@@ -4,7 +4,6 @@ from linebot              import LineBotApi, WebhookHandler
 from linebot.exceptions   import InvalidSignatureError
 from linebot.models       import * #MessageEvent,TextMessage,ImageSendMessage
 from datetime import datetime
-import MongoDB.FuncMongodb as mongo
 import app_utils.app_result as ap
 from flasgger             import Swagger
 import openai
@@ -12,13 +11,13 @@ import os
 import time
 from apscheduler.schedulers.background import BackgroundScheduler
 
-dt_Access = datetime(0,0,0,0,0,0) #不限制就是 None #限制格式 datetime(2023,3,8,23,42,30) 
+dt_Access = datetime(1,1,1,0,0,0) #不限制就是 None #限制格式 datetime(2023,3,8,23,42,30) 
 
 def checkAuthorization():
   dt_now = datetime.now()
   st_now = dt_now.strftime("%Y-%m-%d %H:%M:%S %p")
   
-  if(dt_now > dt_Access and dt_Access!=datetime(0,0,0,0,0,0)):
+  if(dt_now > dt_Access and dt_Access!=datetime(1,1,1,0,0,0)):
     print("Authorization:Failed")
     os._exit()
   else:
@@ -34,6 +33,7 @@ print("Check Authorization.")
 if(checkAuthorization()):
   print("Authorization:PASS")
 loop_checkAuthorization()
+
 print("[Inital][ENV]")
 LINEBOT_POST_TOKEN  = os.environ.get('LINEBOT_POST_TOKEN')
 LINEBOT_RECV_TOKEN  = os.environ.get('LINEBOT_RECV_TOKEN')
@@ -55,19 +55,10 @@ print("ENV:SSL_KEY            : "+str( SSL_KEY))
 
 Linebot_Post_handle = LineBotApi(LINEBOT_POST_TOKEN)
 Linebot_Recv_handle = WebhookHandler(LINEBOT_RECV_TOKEN)
-Mode = 'setting'
+Mode = 'AI Mode'
 
-print("[Inital][Swagger]")
 app = Flask(__name__)
-app.config['SWAGGER'] = {
-    "title": "TeaOrFish",
-    "description": "Flasgger by TeaOrFish,stockSearch in Linebot",
-    "version": "1.0.2",
-    "termsOfService": "",
-    "hide_top_bar": True
-}
 CORS(app)
-Swagger(app)
 
 print("[Inital][SSL]")                          
 
@@ -80,54 +71,22 @@ class opaibotPara:
   model = "text-davinci-003"
   temperature = 0.0
   maxtoken = 200
-      
-print("[Inital][MongoDB]")
-mongo.Clientinit()
+    
       
 str_doc = str(
           "說明:可使用下列參數對AI進型設置\n"
-          # +"【 設定模型:】指定使用的AI模型ex.text-davinci-003 \n"
           +"【 設定溫度: 】設定AI所擁有的情緒 Float: 0~1\n"
           +"【 設定回應長度: 】設定最多能回應的字節 int:0~2048\n"
           +"【 現在數值 】\n"          
           +"並可透過 【AI \{提問內容\}】來進行問答\n"
-          +"爬蟲相關功能:\n"
-          +"【八卦版】 回傳最新十篇八卦版標題與連結\n"
-          +"【西施版】 回傳最新十篇西施版標題與連結\n"
-          +"【表特版】 回傳最新十篇表特版標題與連結\n"
-          +"【TOP】   回傳最新十篇股票版標題與連結\n"
-          +"【s /{2330或股票代號/}】回傳即時傳回的股票行情價格\n"
           )
 
 @app.route("/")
 def home():
   return render_template("home.html")
 
-@app.route("/.well-known/acme-challenge/fKno72R1QH41oxIYC_FWMbivpvGQe0GIZRTUG0VWafs")
-def forcetbot():
-  return render_template("cerbot.html")
-
 @app.route("/callback",methods=['POST'])
 def callback():
-  """
-    接收到LINE發過來的資訊
-    ---
-    tags:
-      - Linebot
-    description:
-      接收到LINE發過來的資訊,並藉此放到@handle中做處理
-    produces: application/json,
-    parameters:
-    - name: name
-      in: path
-      required: true
-      type: string    
-    responses:
-      400:
-        description: InvalidSignatureError
-      200:
-        description: Receive Line request.
-  """
   signature = request.headers['X-Line-Signature']
   body = request.get_data(as_text=True)
   try:
@@ -190,86 +149,9 @@ def handle_message(event):
           max_tokens= opaibotPara.maxtoken, 
           temperature= opaibotPara.temperature)
           rtnstr = response.choices[0].text.lstrip()          
-          if(rtnstr!=None):
-            mongo.Insert_AIQuestion("Question:"+input_Para+"\n Answer:"+rtnstr)
           Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))                      
-                                    
-         
-      #功能型函式   
-      elif mtext[0:10]=='testSpace=':
-          #這邊要呼叫家裡Server的API
-          input_APIAndPara = mtext[10:]
-          response = ap.requests_GET_Other_api(input_APIAndPara)  
-          if type(response)==str:
-            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response))                 
-          else:                    
-            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response.text))                             
-      elif(mtext=='台股行情搜尋說明'):
-          responstring = '請輸入股票代號\n ex. 2330'
-          Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=responstring))                   
-      elif(mtext=='我的ID' or mtext=='我的id'):
-          Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text='當前傳訊息帳號的id為:'+userId))                   
-      elif mtext=='打招呼':       
-        Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text='Hi, 你好!'))                   
-      elif(mtext=='八卦版' or mtext=='西施版' or mtext=='表特版'):        
-          input_APIAndPara=""         
-          if(mtext=='八卦版' ):
-            input_APIAndPara = '/Get_Gossiping_TOP_N_Report,10'
-          elif(mtext=='西施版' ):
-            input_APIAndPara = '/Get_Sex_TOP_N_Report,10'
-          elif(mtext=='表特版' ):
-            input_APIAndPara = '/Get_Beauty_TOP_N_Report,10'            
-          response = ap.requests_GET_Other_api(input_APIAndPara)                                
-          if type(response)==str:
-            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response))                 
-          else:
-            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response.text))                   
-      elif mtext=='TOP':       
-          input_APIAndPara = '/Get_TOP_N_Report,10'
-          response = ap.requests_GET_Stock_api(input_APIAndPara)                    
-          if type(response)==str:
-            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response))                 
-          else:
-            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response.text))                 
-      elif mtext=='TOP20':    
-          input_APIAndPara = '/Get_TOP_N_Report,20'
-          response = ap.requests_GET_Stock_api(input_APIAndPara)                    
-          if type(response)==str:
-            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response))                 
-          else:
-            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response.text))                 
-      elif( mtext.upper()[0:2]=='S 'or
-            mtext.upper()[0:6]=='STOCK:' or
-            mtext.upper()[0:3]=='股票 '            
-          ):
-          stockstr_index=0
-          if(mtext.upper()[0:2]=='S '):
-            stockstr_index = 2
-          elif(mtext.upper()[0:6]=='STOCK:'):
-            stockstr_index = 6
-          elif(mtext.upper()[0:3]=='股票 '):
-            stockstr_index = 3
-          input_APIAndPara = '/SearchStock,'+str(mtext[stockstr_index:])
-          response = ap.requests_POST_Stock_api(input_APIAndPara)                    
-          if type(response)==str:
-            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response))                 
-          else:
-            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response.text))                 
-    
-  # elif(MsgType=="image"):      #CI效能問題，暫時移除OCR功能增加build速度
-  #   if(Mode == 'vision'):    
-  #     print('[Step]['+message_id+' ***收到圖片***]：')        
-  #     message_content = Linebot_Post_handle.get_message_content(message_id)                    
-  #     img_st="尚未辨識"      
-  #     with tempfile.NamedTemporaryFile(suffix='.jpg',delete=False) as tf:
-  #       for chunk in message_content.iter_content():
-  #           tf.write(chunk)              
-  #       file_path = tf.name                
-  #     img_st=Pic_Auth(file_path)        
-  #     print('[Step]辨識完畢,刪除暫存')     
-  #     tf.close()                                
-  #     os.unlink(tf.name)    
-  #     Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=img_st))        
+                                            
+       
       
 def SwitchSettingMode():
   global Mode
