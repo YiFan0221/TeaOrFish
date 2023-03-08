@@ -2,7 +2,7 @@ version: "3.3"
   
 services:
   linebot:
-    image: gary80221/linebotrelease
+    image: linebotrelease
     ports:
       - "4000:4000"
     build: .
