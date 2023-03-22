@@ -8,9 +8,10 @@ Aptfile
 bat_Flask.bat
 Bat_LineBot.bat
 bat_ngrok.bat
-SSL_AWS/
-SSL_YiFanServer/
+SSL_AWS/*
+SSL_YiFanServer/*
 .env
+venv/*
 docker-compose.yml
 dockerfile
 ngrok.exe

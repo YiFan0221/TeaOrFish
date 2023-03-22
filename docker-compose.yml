@@ -6,19 +6,20 @@ services:
     ports:
       - "4000:4000"
     build: .
-
+    env_file:
+      - ./.env
     environment:      
-      LINEBOT_POST_TOKEN: ${LINEBOT_POST_TOKEN}
-      LINEBOT_RECV_TOKEN: ${LINEBOT_RECV_TOKEN}     
-      TARGET_SERVER_URL : ${TARGET_SERVER_URL}
-      TEAORFISH_SERVER_PORT: ${TEAORFISH_SERVER_PORT}
-      SSL_PEM : /run/secrets/SSL_PEM
-      SSL_KEY : /run/secrets/SSL_KEY
+      SSL_PEM : /run/secrets/SSL_PEM 
+      SSL_KEY : /run/secrets/SSL_KEY       
     secrets:
       - SSL_PEM
       - SSL_KEY
-    # networks:
-    #   - app-net
+    networks: 
+      - mynet   
+
+networks:
+  mynet:
+    driver: bridge
 
 secrets:
   SSL_PEM:
@@ -27,8 +28,5 @@ secrets:
     file: ./SSL_YiFanServer/YiFanServer.Key
   
 
-# networks:
-#   app-net:
-#     external:
-#       name: nat
+
  
