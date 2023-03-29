@@ -145,7 +145,7 @@ def callback():
   return 'OK'
         
 def checkAccessID(userID):
-  if(userID == OPENAI_AdminID):
+  if(str(userID) == str(OPENAI_AdminID)):
     return True
   else:
     return False
