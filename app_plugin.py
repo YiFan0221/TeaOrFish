@@ -12,7 +12,7 @@ import os
 import time
 from apscheduler.schedulers.background import BackgroundScheduler
 
-dt_Access = datetime(0,0,0,0,0,0) #不限制就是 None #限制格式 datetime(2023,3,8,23,42,30) 
+dt_Access = datetime(2100,1,1,1,1,1) #不限制就是 None #限制格式 datetime(2023,3,8,23,42,30) 
 
 def checkAuthorization():
   dt_now = datetime.now()
@@ -103,7 +103,7 @@ str_docAISetting = str(
           +"並可透過 【AI \{提問內容\}】來進行問答\n"
           )
 str_docAITalk = str(
-          "說明:可直接對談。
+          "說明:對談模式。"
           )
 
 @app.route("/")
@@ -146,7 +146,7 @@ def callback():
 def checkAccessID(userID):
   if(userID == OPENAI_AdminID):
     return True
-  else
+  else:
     return False
 @Linebot_Recv_handle.add(MessageEvent)
 def handle_message(event):
@@ -161,23 +161,24 @@ def handle_message(event):
       print('['+message_id+' ***收到文字***]：')
       
       #先檢查是不是設定模式指令
-      if mtext=='switch':        
-        rtnstr=SwitchSettingMode()
-        if(CheckAIMode()):
-          rtnstr=rtnstr+"\n"+str_docAITalk
-        elif(CheckAISettingMode()):
-          rtnstr=rtnstr+"\n"+str_docAISetting
-        else:
-          rtnstr=rtnstr+"\n"+str_doc                   
+      if mtext=='switch' or mtext=='切換模式':        
+        rtnstr=SwitchSettingMode(userId)
+        rtnstr=rtnstr+"\n"+ ShowDoc();               
         Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))     
-      elif mtext=='switcM':
+      elif mtext=='switcM' or mtext=='當前模式':
         Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=ShowMode()))     
-        
-      elif (CheckAISettingMode()==true):        
-          if ('使用說明'in mtext) or ('說明'in mtext) :
+       
+      elif mtext=='使用說明' or mtext=='說明' :
+        if(checkAccessID(userId)==True):  
+            rtnstr=ShowDoc(); 
+        else:
             rtnstr=str_doc
-            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))    
-          elif ('現在數值'in mtext) or ('設定值'in mtext):
+        Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))     
+        
+        
+      
+      elif (isAISettingMode()==True) and (checkAccessID(userId)==True):        
+          if ('現在數值'in mtext) or ('設定值'in mtext):
             # https://beta.openai.com/docs/api-reference/completions/create
             rtnstr=str('Model: \t'+str(opaibotPara.model)
             +'\nTemperature: \t'+str(opaibotPara.temperature)
@@ -199,18 +200,18 @@ def handle_message(event):
             rtnstr='opaibotPara.maxtoken: '+str(opaibotPara.maxtoken)
             Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))               
       #對談模式
-      elif (CheckAIMode()==true):
-          if(checkAccessID(userId)==True):        
-            response = openai.Completion.create(
-            model= opaibotPara.model ,
-            prompt=input_Para,
-            max_tokens= opaibotPara.maxtoken, 
-            temperature= opaibotPara.temperature)
-            rtnstr = response.choices[0].text.lstrip()          
-            if(rtnstr!=None):
-              mongo.Insert_AIQuestion("Question:"+input_Para+"\n Answer:"+rtnstr)
-            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))                      
-                                    
+      elif (isAIMode()==True) and (checkAccessID(userId)==True):
+          response = openai.Completion.create(
+          model= opaibotPara.model ,
+          prompt=mtext,
+          max_tokens= opaibotPara.maxtoken, 
+          temperature= opaibotPara.temperature)
+          rtnstr = response.choices[0].text.lstrip()          
+          if(rtnstr!=None):
+            mongo.Insert_AIQuestion("Question:"+mtext+"\n Answer:"+rtnstr)
+          Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))                      
+          
+                                  
          
       #功能型函式   
       else:
@@ -289,7 +290,7 @@ def handle_message(event):
   #     os.unlink(tf.name)    
   #     Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=img_st))        
       
-def SwitchSettingMode():
+def SwitchSettingMode(userId):
   global Mode
   oldMode = Mode
   if(Mode == 'AI Mode'):
@@ -297,7 +298,7 @@ def SwitchSettingMode():
   elif(Mode == 'Normal Mode'):
     Mode = 'AISetting Mode'
   elif(Mode == 'AISetting Mode'):
-    if(CheckAIMode()==True):
+    if(checkAccessID(userId)==True):
       Mode = 'AI Mode'
     else:
       Mode = 'Normal Mode'
@@ -305,21 +306,21 @@ def SwitchSettingMode():
     Mode = 'AI Mode'
   return '模式:'+oldMode+' 更換為:'+Mode
 
-def CheckNormalMode():
+def isNormalMode():
   global Mode
   if(Mode == 'Normal Mode'):
     return True
   else :
     return False
 
-def CheckAISettingMode():
+def isAISettingMode():
   global Mode
   if(Mode == 'AISetting Mode'):
     return True
   else :
     return False
   
-def CheckAIMode():
+def isAIMode():
   global Mode
   if(Mode == 'AI Mode'):
     return True
@@ -329,6 +330,15 @@ def CheckAIMode():
 def ShowMode():
   global Mode
   return '現在模式為: '+Mode
+
+def ShowDoc():
+  if(isAIMode()):
+    return str_docAITalk
+  elif(isAISettingMode()):
+    return str_docAISetting
+  else:
+    return str_doc
+    
 
 print("[Finnish]..........Linebot Flask start!")
 if __name__ == '__main__':
