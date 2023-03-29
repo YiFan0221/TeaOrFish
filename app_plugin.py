@@ -43,6 +43,7 @@ SSL_PEM             = os.environ.get('SSL_PEM')
 SSL_KEY             = os.environ.get('SSL_KEY')
 SERVER_PORT         = os.environ.get('TEAORFISH_SERVER_PORT')
 openai.api_key      = os.getenv("OPENAI_API_KEY")
+OPENAI_AdminID      = os.environ.get('OPENAI_AdminID')
 
 print("ENV:LINEBOT_POST_TOKEN : "+LINEBOT_POST_TOKEN )
 print("ENV:TARGET_SERVER_URL  : "+TARGET_SERVER_URL )
@@ -55,7 +56,7 @@ print("ENV:SSL_KEY            : "+str( SSL_KEY))
 
 Linebot_Post_handle = LineBotApi(LINEBOT_POST_TOKEN)
 Linebot_Recv_handle = WebhookHandler(LINEBOT_RECV_TOKEN)
-Mode = 'setting'
+Mode = 'Normal Mode'
 
 print("[Inital][Swagger]")
 app = Flask(__name__)
@@ -85,18 +86,24 @@ print("[Inital][MongoDB]")
 mongo.Clientinit()
       
 str_doc = str(
+          "說明:爬蟲相關功能\n"
+          +"【八卦版】 回傳最新十篇八卦版標題與連結\n"
+          +"【西施版】 回傳最新十篇西施版標題與連結\n"
+          +"【表特版】 回傳最新十篇表特版標題與連結\n"
+          +"【TOP】   回傳最新十篇股票版標題與連結\n"
+          +"【s /{2330或股票代號/}】回傳即時傳回的股票行情價格\n"
+          )
+
+str_docAISetting = str(
           "說明:可使用下列參數對AI進型設置\n"
           # +"【 設定模型:】指定使用的AI模型ex.text-davinci-003 \n"
           +"【 設定溫度: 】設定AI所擁有的情緒 Float: 0~1\n"
           +"【 設定回應長度: 】設定最多能回應的字節 int:0~2048\n"
           +"【 現在數值 】\n"          
           +"並可透過 【AI \{提問內容\}】來進行問答\n"
-          +"爬蟲相關功能:\n"
-          +"【八卦版】 回傳最新十篇八卦版標題與連結\n"
-          +"【西施版】 回傳最新十篇西施版標題與連結\n"
-          +"【表特版】 回傳最新十篇表特版標題與連結\n"
-          +"【TOP】   回傳最新十篇股票版標題與連結\n"
-          +"【s /{2330或股票代號/}】回傳即時傳回的股票行情價格\n"
+          )
+str_docAITalk = str(
+          "說明:可直接對談。
           )
 
 @app.route("/")
@@ -136,6 +143,11 @@ def callback():
       abort(400)
   return 'OK'
         
+def checkAccessID(userID):
+  if(userID == OPENAI_AdminID):
+    return True
+  else
+    return False
 @Linebot_Recv_handle.add(MessageEvent)
 def handle_message(event):
   print(event.message)
@@ -151,110 +163,116 @@ def handle_message(event):
       #先檢查是不是設定模式指令
       if mtext=='switch':        
         rtnstr=SwitchSettingMode()
-        if(CheckSettingMode()):
-          rtnstr=rtnstr+"\n"+str_doc
+        if(CheckAIMode()):
+          rtnstr=rtnstr+"\n"+str_docAITalk
+        elif(CheckAISettingMode()):
+          rtnstr=rtnstr+"\n"+str_docAISetting
+        else:
+          rtnstr=rtnstr+"\n"+str_doc                   
         Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))     
       elif mtext=='switcM':
         Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=ShowMode()))     
-
-      elif ('使用說明'in mtext) or ('說明'in mtext) :
-        rtnstr=str_doc
-        Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))    
-      elif ('現在數值'in mtext) or ('設定值'in mtext):
-        # https://beta.openai.com/docs/api-reference/completions/create
-        rtnstr=str('Model: \t'+str(opaibotPara.model)
-        +'\nTemperature: \t'+str(opaibotPara.temperature)
-        +'\nMaxtokens: \t'+str(opaibotPara.maxtoken))
-        Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))              
-      elif '設定模型' in mtext:
-        para = mtext[len('設定模型')+1:]
-        opaibotPara.model = para 
-        rtnstr='opaibotPara.model: '+str(opaibotPara.model)
-        Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))     
-      elif ('設定溫度'in mtext) or ('設定情緒'in mtext):
-        para =  mtext[len('設定溫度')+1:]
-        opaibotPara.temperature = float(para)
-        rtnstr='opaibotPara.temperature: '+str(opaibotPara.temperature)
-        Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))                  
-      elif '設定回應長度' in mtext:
-        para = mtext[len('設定回應長度')+1:]
-        opaibotPara.maxtoken = int(para)
-        rtnstr='opaibotPara.maxtoken: '+str(opaibotPara.maxtoken)
-        Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))               
-      elif mtext.upper()[0:3]=='AI ':   
-        if(CheckSettingMode()==True):
-          input_Para = mtext[3:]                 
-          response = openai.Completion.create(
-          model= opaibotPara.model ,
-          prompt=input_Para,
-          max_tokens= opaibotPara.maxtoken, 
-          temperature= opaibotPara.temperature)
-          rtnstr = response.choices[0].text.lstrip()          
-          if(rtnstr!=None):
-            mongo.Insert_AIQuestion("Question:"+input_Para+"\n Answer:"+rtnstr)
-          Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))                      
+        
+      elif (CheckAISettingMode()==true):        
+          if ('使用說明'in mtext) or ('說明'in mtext) :
+            rtnstr=str_doc
+            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))    
+          elif ('現在數值'in mtext) or ('設定值'in mtext):
+            # https://beta.openai.com/docs/api-reference/completions/create
+            rtnstr=str('Model: \t'+str(opaibotPara.model)
+            +'\nTemperature: \t'+str(opaibotPara.temperature)
+            +'\nMaxtokens: \t'+str(opaibotPara.maxtoken))
+            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))              
+          elif '設定模型' in mtext:
+            para = mtext[len('設定模型')+1:]
+            opaibotPara.model = para 
+            rtnstr='opaibotPara.model: '+str(opaibotPara.model)
+            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))     
+          elif ('設定溫度'in mtext) or ('設定情緒'in mtext):
+            para =  mtext[len('設定溫度')+1:]
+            opaibotPara.temperature = float(para)
+            rtnstr='opaibotPara.temperature: '+str(opaibotPara.temperature)
+            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))                  
+          elif '設定回應長度' in mtext:
+            para = mtext[len('設定回應長度')+1:]
+            opaibotPara.maxtoken = int(para)
+            rtnstr='opaibotPara.maxtoken: '+str(opaibotPara.maxtoken)
+            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))               
+      #對談模式
+      elif (CheckAIMode()==true):
+          if(checkAccessID(userId)==True):        
+            response = openai.Completion.create(
+            model= opaibotPara.model ,
+            prompt=input_Para,
+            max_tokens= opaibotPara.maxtoken, 
+            temperature= opaibotPara.temperature)
+            rtnstr = response.choices[0].text.lstrip()          
+            if(rtnstr!=None):
+              mongo.Insert_AIQuestion("Question:"+input_Para+"\n Answer:"+rtnstr)
+            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))                      
                                     
          
       #功能型函式   
-      elif mtext[0:10]=='testSpace=':
-          #這邊要呼叫家裡Server的API
-          input_APIAndPara = mtext[10:]
-          response = ap.requests_GET_Other_api(input_APIAndPara)  
-          if type(response)==str:
-            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response))                 
-          else:                    
-            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response.text))                             
-      elif(mtext=='台股行情搜尋說明'):
-          responstring = '請輸入股票代號\n ex. 2330'
-          Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=responstring))                   
-      elif(mtext=='我的ID' or mtext=='我的id'):
-          Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text='當前傳訊息帳號的id為:'+userId))                   
-      elif mtext=='打招呼':       
-        Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text='Hi, 你好!'))                   
-      elif(mtext=='八卦版' or mtext=='西施版' or mtext=='表特版'):        
-          input_APIAndPara=""         
-          if(mtext=='八卦版' ):
-            input_APIAndPara = '/Get_Gossiping_TOP_N_Report,10'
-          elif(mtext=='西施版' ):
-            input_APIAndPara = '/Get_Sex_TOP_N_Report,10'
-          elif(mtext=='表特版' ):
-            input_APIAndPara = '/Get_Beauty_TOP_N_Report,10'            
-          response = ap.requests_GET_Other_api(input_APIAndPara)                                
-          if type(response)==str:
-            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response))                 
-          else:
-            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response.text))                   
-      elif mtext=='TOP':       
-          input_APIAndPara = '/Get_TOP_N_Report,10'
-          response = ap.requests_GET_Stock_api(input_APIAndPara)                    
-          if type(response)==str:
-            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response))                 
-          else:
-            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response.text))                 
-      elif mtext=='TOP20':    
-          input_APIAndPara = '/Get_TOP_N_Report,20'
-          response = ap.requests_GET_Stock_api(input_APIAndPara)                    
-          if type(response)==str:
-            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response))                 
-          else:
-            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response.text))                 
-      elif( mtext.upper()[0:2]=='S 'or
-            mtext.upper()[0:6]=='STOCK:' or
-            mtext.upper()[0:3]=='股票 '            
-          ):
-          stockstr_index=0
-          if(mtext.upper()[0:2]=='S '):
-            stockstr_index = 2
-          elif(mtext.upper()[0:6]=='STOCK:'):
-            stockstr_index = 6
-          elif(mtext.upper()[0:3]=='股票 '):
-            stockstr_index = 3
-          input_APIAndPara = '/SearchStock,'+str(mtext[stockstr_index:])
-          response = ap.requests_POST_Stock_api(input_APIAndPara)                    
-          if type(response)==str:
-            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response))                 
-          else:
-            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response.text))                 
+      else:
+          if mtext[0:10]=='testSpace=':
+              #這邊要呼叫家裡Server的API
+              input_APIAndPara = mtext[10:]
+              response = ap.requests_GET_Other_api(input_APIAndPara)  
+              if type(response)==str:
+                Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response))                 
+              else:                    
+                Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response.text))                             
+          elif(mtext=='台股行情搜尋說明'):
+              responstring = '請輸入股票代號\n ex. 2330'
+              Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=responstring))                   
+          elif(mtext=='我的ID' or mtext=='我的id'):
+              Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text='當前傳訊息帳號的id為:'+userId))                   
+          elif mtext=='打招呼':       
+            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text='Hi, 你好!'))                   
+          elif(mtext=='八卦版' or mtext=='西施版' or mtext=='表特版'):        
+              input_APIAndPara=""         
+              if(mtext=='八卦版' ):
+                input_APIAndPara = '/Get_Gossiping_TOP_N_Report,10'
+              elif(mtext=='西施版' ):
+                input_APIAndPara = '/Get_Sex_TOP_N_Report,10'
+              elif(mtext=='表特版' ):
+                input_APIAndPara = '/Get_Beauty_TOP_N_Report,10'            
+              response = ap.requests_GET_Other_api(input_APIAndPara)                                
+              if type(response)==str:
+                Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response))                 
+              else:
+                Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response.text))                   
+          elif mtext=='TOP':       
+              input_APIAndPara = '/Get_TOP_N_Report,10'
+              response = ap.requests_GET_Stock_api(input_APIAndPara)                    
+              if type(response)==str:
+                Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response))                 
+              else:
+                Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response.text))                 
+          elif mtext=='TOP20':    
+              input_APIAndPara = '/Get_TOP_N_Report,20'
+              response = ap.requests_GET_Stock_api(input_APIAndPara)                    
+              if type(response)==str:
+                Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response))                 
+              else:
+                Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response.text))                 
+          elif( mtext.upper()[0:2]=='S 'or
+                mtext.upper()[0:6]=='STOCK:' or
+                mtext.upper()[0:3]=='股票 '            
+              ):
+              stockstr_index=0
+              if(mtext.upper()[0:2]=='S '):
+                stockstr_index = 2
+              elif(mtext.upper()[0:6]=='STOCK:'):
+                stockstr_index = 6
+              elif(mtext.upper()[0:3]=='股票 '):
+                stockstr_index = 3
+              input_APIAndPara = '/SearchStock,'+str(mtext[stockstr_index:])
+              response = ap.requests_POST_Stock_api(input_APIAndPara)                    
+              if type(response)==str:
+                Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response))                 
+              else:
+                Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response.text))                 
     
   # elif(MsgType=="image"):      #CI效能問題，暫時移除OCR功能增加build速度
   #   if(Mode == 'vision'):    
@@ -276,16 +294,38 @@ def SwitchSettingMode():
   oldMode = Mode
   if(Mode == 'AI Mode'):
     Mode = 'Normal Mode'
+  elif(Mode == 'Normal Mode'):
+    Mode = 'AISetting Mode'
+  elif(Mode == 'AISetting Mode'):
+    if(CheckAIMode()==True):
+      Mode = 'AI Mode'
+    else:
+      Mode = 'Normal Mode'
   else :
     Mode = 'AI Mode'
   return '模式:'+oldMode+' 更換為:'+Mode
-    
-def CheckSettingMode():
+
+def CheckNormalMode():
+  global Mode
+  if(Mode == 'Normal Mode'):
+    return True
+  else :
+    return False
+
+def CheckAISettingMode():
+  global Mode
+  if(Mode == 'AISetting Mode'):
+    return True
+  else :
+    return False
+  
+def CheckAIMode():
   global Mode
   if(Mode == 'AI Mode'):
     return True
   else :
     return False
+
 def ShowMode():
   global Mode
   return '現在模式為: '+Mode
