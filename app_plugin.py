@@ -229,6 +229,9 @@ def handle_message(event):
               Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=responstring))                   
           elif(mtext=='我的ID' or mtext=='我的id'):
               Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text='當前傳訊息帳號的id為:'+userId))                   
+          elif(mtext=='是否為使用者'):
+              rtnstr = 'userid:['+userId+']\n'+'env:['+OPENAI_AdminID+']\n'+ ' 是否為管理者:'+str( checkAccessID(userId))
+              Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))                           
           elif mtext=='打招呼':       
             Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text='Hi, 你好!'))                   
           elif(mtext=='八卦版' or mtext=='西施版' or mtext=='表特版'):        
