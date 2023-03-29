@@ -53,6 +53,7 @@ print("ENV:SECRETS_SSL_PEM    : "+str( os.path.exists("/run/secrets/SSL_PEM") ))
 print("ENV:SECRETS_SSL_KEY    : "+str( os.path.exists("/run/secrets/SSL_KEY") ))
 print("ENV:SSL_PEM            : "+str( SSL_PEM))
 print("ENV:SSL_KEY            : "+str( SSL_KEY))
+print("ENV:OPENAI_AdminID     : "+str( OPENAI_AdminID))
 
 Linebot_Post_handle = LineBotApi(LINEBOT_POST_TOKEN)
 Linebot_Recv_handle = WebhookHandler(LINEBOT_RECV_TOKEN)
