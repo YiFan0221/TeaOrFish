@@ -11,7 +11,7 @@ import openai
 import os
 import time
 from apscheduler.schedulers.background import BackgroundScheduler
-
+from collections import deque
 dt_Access = datetime(2100,1,1,1,1,1) #不限制就是 None #限制格式 datetime(2023,3,8,23,42,30) 
 
 def checkAuthorization():
@@ -82,6 +82,14 @@ class opaibotPara:
   model = "text-davinci-003"
   temperature = 0.0
   maxtoken = 200
+  top_p = 1
+  n = 1
+  stream = False
+  stop = ["******"]
+  presence_penalty = 0 
+  frequency_penalty = 0
+  logit_bias = None
+  
       
 print("[Inital][MongoDB]")
 mongo.Clientinit()
@@ -106,6 +114,12 @@ str_docAISetting = str(
 str_docAITalk = str(
           "說明:對談模式。"
           )
+
+DialogueBuffer = deque()
+Dialogue = {
+    'Question': None,
+    'Answer': None,
+}
 
 @app.route("/")
 def home():
@@ -162,7 +176,7 @@ def handle_message(event):
       print('['+message_id+' ***收到文字***]：')
       
       #先檢查是不是設定模式指令
-      if mtext=='switch' or mtext=='切換模式':        
+      if mtext=='sssw' or mtext=='switch' or mtext=='切換模式':        
         rtnstr=SwitchSettingMode(userId)
         rtnstr=rtnstr+"\n"+ ShowDoc();               
         Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))     
@@ -201,17 +215,38 @@ def handle_message(event):
             rtnstr='opaibotPara.maxtoken: '+str(opaibotPara.maxtoken)
             Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))               
       #對談模式
-      elif (isAIMode()==True) and (checkAccessID(userId)==True):
-          response = openai.Completion.create(
-          model= opaibotPara.model ,
-          prompt=mtext,
-          max_tokens= opaibotPara.maxtoken, 
-          temperature= opaibotPara.temperature)
-          rtnstr = response.choices[0].text.lstrip()          
-          if(rtnstr!=None):
-            mongo.Insert_AIQuestion("Question:"+mtext+"\n Answer:"+rtnstr)
-          Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))                      
-          
+      elif (isAITalkMode()==True) and (checkAccessID(userId)==True):
+          if(len(mtext)==3):
+            if(mtext=='mmk' or mtext=='mkr'):
+              set_DialogueBuffer()
+              Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text='reg.'))                        
+            elif(mtext=='clr'):
+              clean_DialogueBuffer()
+              Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text='[clean buffer]'))                      
+            elif(mtext=='shw'):
+               Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=get_DialogueBuffer()))                      
+              
+          else:
+            clean_DialogueCatch()
+            
+            sendstr = get_DialogueBuffer()+mtext
+            response = openai.Completion.create(
+            model= opaibotPara.model ,
+            prompt=sendstr,
+            max_tokens= opaibotPara.maxtoken, 
+            temperature= opaibotPara.temperature,
+            stop = opaibotPara.stop)
+            
+            rtnstr = response.choices[0].text.lstrip()          
+            
+            set_DialogueCatch(mtext,rtnstr)
+            if(rtnstr!=None):
+              mongo.Insert_AIQuestion("Question:"+mtext+"\n Answer:"+rtnstr)
+            if(rtnstr==''):
+              Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text='...'))                      
+            else:
+              Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))                      
+            
                                   
          
       #功能型函式   
@@ -293,6 +328,51 @@ def handle_message(event):
   #     tf.close()                                
   #     os.unlink(tf.name)    
   #     Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=img_st))        
+
+
+### DialogueBuffer
+def clean_DialogueBuffer():
+  global DialogueBuffer
+  DialogueBuffer.clear()
+
+def set_DialogueBuffer():
+  global Dialogue,DialogueBuffer
+  if(Dialogue['Question']!=''):
+    DialogueBuffer.append('Q:'+Dialogue['Question']+"\n******")
+  DialogueBuffer.append('A:'+Dialogue['Answer']+"\n******")  
+  
+def get_DialogueBuffer()->str:
+  global DialogueBuffer
+  rtnstr=""
+  
+  if(len(DialogueBuffer)==0):
+    return '[empty.]'
+  for d in DialogueBuffer:
+    rtnstr = rtnstr + d + '\n'
+    
+  return rtnstr
+
+### DialogueBuffer
+
+### DialogueCatch
+def clean_DialogueCatch():
+  global Dialogue
+  Dialogue['Question']=None
+  Dialogue['Answer']=None
+
+def set_DialogueCatch(question:str,answer:str):
+  global Dialogue
+  if(question!='繼續' and question.lower()!='continue'):
+    Dialogue['Question']=question
+  else:
+    Dialogue['Question']='' #空字串 不能用None
+  Dialogue['Answer']=answer
+  
+def get_DialogueCatch():
+  global Dialogue
+  return str(Dialogue['Question']) , str(Dialogue['Answer'])
+### DialogueCatch
+
       
 def SwitchSettingMode(userId):
   global Mode
@@ -324,7 +404,7 @@ def isAISettingMode():
   else :
     return False
   
-def isAIMode():
+def isAITalkMode():
   global Mode
   if(Mode == 'AI Mode'):
     return True
@@ -336,7 +416,7 @@ def ShowMode():
   return '現在模式為: '+Mode
 
 def ShowDoc():
-  if(isAIMode()):
+  if(isAITalkMode()):
     return str_docAITalk
   elif(isAISettingMode()):
     return str_docAISetting
