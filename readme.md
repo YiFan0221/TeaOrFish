@@ -47,6 +47,8 @@ http://jianiau.blogspot.com/2015/07/openssl-generate-csr.html
 > 
 
 ### venv啟用關閉
+#### 創建
+> python -m venv tutorial-env
 #### 啟用
 > source ./venv/bin/activate
 #### 關閉
