@@ -8,7 +8,7 @@
             "type": "shell",
             "command": "python3",
             "args": [
-                "linebotTest1.py"
+                "linebotApp.py"
             ],
             "options": {
                 "cwd": "${workspaceFolder}",

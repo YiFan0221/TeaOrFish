@@ -4,7 +4,7 @@ COPY . /
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
-CMD [ "python3", "./linebotTest1.py" ]
+CMD [ "python3", "./linebotApp.py" ]
 
 #ping
 EXPOSE 22

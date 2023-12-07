@@ -14,7 +14,7 @@ pip3 install pyinstaller
 python3 setup.py build_ext --inplace
 
 find . -name "*.c" | xargs rm -f
-find . -name "*.py" ! -name "linebotTest1.py" | xargs rm -f
+find . -name "*.py" ! -name "linebotApp.py" | xargs rm -f
 rm -rf build
 
 cd -

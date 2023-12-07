@@ -12,6 +12,10 @@ import os
 import time
 from apscheduler.schedulers.background import BackgroundScheduler
 from collections import deque
+import logging
+
+logger = logging.getLogger("linebotApp")
+
 dt_Access = datetime(2100, 1, 1, 1, 1, 1) #不限制就是 None #限制格式 datetime(2023,3,8,23,42,30) 
 
 def checkAuthorization():
@@ -24,15 +28,20 @@ def checkAuthorization():
   else:
     return True
 
-def loop_checkAuthorization():
-  scheduler = BackgroundScheduler(timezone = "Asia/Taipei")
+def loop_checkAuthorization(in_timezone):
+  scheduler = BackgroundScheduler(timezone = in_timezone)
   scheduler.add_job(checkAuthorization, 'interval', hours=1)
   scheduler.start()
 
 print("Check Authorization.")
 if(checkAuthorization()):
+  logger.info ('Authorization:PASS')
   print("Authorization:PASS")
-loop_checkAuthorization()
+else:
+  logger.info ('Authorization:Failed')
+  print("Authorization:Failed")
+  exit()
+loop_checkAuthorization("Asia/Taipei")
 
 print("[Inital][ENV]")
 LINEBOT_POST_TOKEN    = os.environ.get('LINEBOT_POST_TOKEN')
@@ -126,6 +135,7 @@ def isMainUser(userID):
 
 @app.route("/")
 def home():
+  logger.info("home started")
   return render_template("home.html")
 
 @app.route("/.well-known/acme-challenge/fKno72R1QH41oxIYC_FWMbivpvGQe0GIZRTUG0VWafs")
@@ -153,11 +163,16 @@ def callback():
       200:
         description: Receive Line request.
   """
+  logger.info("Line callback started")
   signature = request.headers['X-Line-Signature']
   body = request.get_data(as_text=True)
   try:
       Linebot_Recv_handle.handle(body,signature)
-  except InvalidSignatureError:
+  except InvalidSignatureError as e:
+      logger.error(f"InvalidSignatureError: {e}")
+      abort(400)
+  except Exception as e:
+      logger.error(f"Error Exception: {e}")      
       abort(400)
   return 'OK'
         
