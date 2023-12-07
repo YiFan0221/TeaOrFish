@@ -5,9 +5,15 @@ import atexit
 import sys
 import logging
 
-
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logformat = f"%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+handler = logging.FileHandler('lintbotApp.log')
+formatter = logging.Formatter(logformat)
+handler.setFormatter(formatter)
+handler.setLevel(logging.INFO)
+logging.basicConfig(level=logging.INFO, format=logformat)
 logger = logging.getLogger("linebotApp")
+logger.setLevel(logging.INFO)
+logger.addHandler(handler)
 
 @atexit.register
 def close_flask():

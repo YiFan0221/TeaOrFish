@@ -10,3 +10,4 @@ SSL_AWS/*
 SSL_YiFanServer/*
 .gitignore
 SSL_YiFanServer/o1yfnoip_ddns_net.pem-chain
+lintbotApp.log
