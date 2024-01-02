@@ -169,11 +169,14 @@ def callback():
   try:
       Linebot_Recv_handle.handle(body,signature)
   except InvalidSignatureError as e:
-      logger.error(f"InvalidSignatureError: {e}")
+      logger.error(f"InvalidSignatureError: {str(e)}")
       abort(400)
+  except ValueError as e:
+      logger.error(f"Error Exception: {str(e)}") 
+      abort(500)
   except Exception as e:
-      logger.error(f"Error Exception: {e}")      
-      abort(400)
+      logger.error(f"Error Exception: {str(e)}") 
+      abort(400)      
   return 'OK'
         
 @Linebot_Recv_handle.add(MessageEvent)

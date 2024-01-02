@@ -60,20 +60,18 @@ def requests_api(REST:RESTful , ServerURL:str , input_APIAndPara):
       StateSt = requests.get(apiurl, json=sendobj , headers=header, verify=False )  
     elif(REST == RESTful.POST):
       StateSt = requests.post(apiurl, json=sendobj , headers=header, verify=False)
-    logger.info("requests_api OK")
-  except requests.exceptions.Timeout as e:
+    logger.info("requests_api OK")    
+  except (requests.exceptions.ConnectionError,
+          requests.exceptions.SSLError,
+          requests.exceptions.Timeout,
+          requests.exceptions.HTTPError,
+          requests.exceptions.ProxyError,
+          Exception) as e:
     httpcode = 500
-    StateSt = '服務器回應過長，請聯繫開發者'
-    logger.error(f"{httpcode} {StateSt.text} e{e}")
-    
-  except requests.exceptions.TooManyRedirects as e:
-    httpcode = 503
-    StateSt = '服務器異常，請聯繫開發者'
-    logger.error(f"{httpcode} {StateSt.text} e{e}")
-  except Exception as e:
-    httpcode = 500
-    StateSt = '發生未知錯誤，請聯繫開發者'      
-    logger.error(f"{httpcode} {StateSt.text} e{e}")
+    StateSt = str(e)
+    errormsg = f"httpcode:{httpcode}, StateSt:{StateSt}"
+    logger.error( errormsg )
+    raise ValueError (f'{httpcode} {status[httpcode]} {default_description[httpcode]}')
   if type(StateSt)!=str:      
     respon = json.loads(f"{StateSt.text}")
   return respon['result']
@@ -90,8 +88,8 @@ status = {
 
 #http code description (default)
 default_description = {
-  200:"Successful response.",
-  400:"Please check paras or query valid.",
+  200: 'Successful response.',
+  400: 'Please check paras or query valid.',
   401: 'Please read the document to check API.',
 	403: 'Please read the document to check API.',
 	404: 'Please read the document to check API.',
