@@ -4,10 +4,11 @@ venv
 ssl.conf
 SSL_AWS/*
 SSL_YiFanServer/*
+SSL_YiFanServer2/*
 TeaOrFish/
 __pycache__/
 SSL_AWS/*
-SSL_YiFanServer/*
+
 .gitignore
 SSL_YiFanServer/o1yfnoip_ddns_net.pem-chain
 lintbotApp.log

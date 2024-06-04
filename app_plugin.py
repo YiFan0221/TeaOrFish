@@ -89,18 +89,10 @@ context = ssl.SSLContext()
 context.load_cert_chain(SSL_PEM,SSL_KEY)
       
 
-class opaibotPara:
-  model = "text-davinci-003"
-  temperature = 0.0
-  maxtoken = 200
-  top_p = 1
-  n = 1
-  stream = False
-  stop = ["******"]
-  presence_penalty = 0 
-  frequency_penalty = 0
-  logit_bias = None
-  
+class ChatCompletionsPara: # the prev version completions parameters commit: 915c6a8e481c532438b0af5b68b5ceb6e28258ab
+  model = "gpt-3.5-turbo"
+  maxtoken = 150
+
       
 print("[Inital][MongoDB]")
 mongo.Clientinit()
@@ -108,24 +100,20 @@ mongo.Clientinit()
 boardlist=['TOP','八卦版','西施版','表特版']
 str_docAITalk = f"說明:對談模式。"
 str_doc = f"說明:爬蟲相關功能\n\
-【八卦版】 回傳最新十篇八卦版標題與連結\n\
-【西施版】 回傳最新十篇西施版標題與連結\n\
-【表特版】 回傳最新十篇表特版標題與連結\n\
-【TOP】   回傳最新十篇股票版標題與連結\n\
-【s {{2330或股票代號}}】回傳即時傳回的股票行情價格\n"
+【八卦版】 最新十篇八卦版標題與連結\n\
+【西施版】 最新十篇西施版標題與連結\n\
+【表特版】 最新十篇表特版標題與連結\n\
+【TOP】   最新十篇股票版標題與連結\n\
+【我的ID】 回傳當前使用者UUID\n\
+【是否為管理者】回傳當前使用者是否為管理者"
+
 str_docAISetting = f"說明:可使用下列參數對AI進型設置\n\
-【 設定模型:】指定使用的AI模型ex.text-davinci-003 \n\
-【 設定溫度: 】設定AI所擁有的情緒 Float: 0~1\n\
-【 設定回應長度: 】設定最多能回應的字節 int:0~2048\n\
-【 現在數值 】\n\
-並可透過 【AI {{提問內容}}】來進行問答\n"          
+【 更換模型:】指定使用的AI模型ex.gpt-3.5-turbo \n\
+【 回應長度: 】設定最多能回應的字節 int:0~2048\n\
+【 現在數值 】【設定值】顯示當前設定\n"
 
 
-DialogueBuffer = deque()
-Dialogue = {
-    'Question': None,
-    'Answer': None,
-}
+
 
 def isMainUser(userID):
   if(str(userID) == str(OPENAI_AdminID)):
@@ -192,55 +180,51 @@ def handle_message(event):
       print(f"['{message_id} ***收到文字***]：")      
       if(isAITalkMode == True and not isMainUser(userId) ):
         Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text='目前尚未開放中'))
-      else:
-     
-        
+      else:     
         #Only for main user
         if isMainUser(userId) == True:
           #Check command or not.
-          if mtext=='切換模式' or mtext=='sssw' or mtext=='switch' :        
+          if mtext=='切換' or mtext=='切換模式' or mtext=='SW' or mtext=='switch' :        
             rtnstr=f"{SwitchSettingMode(userId)}\n{ShowDoc()}"
             Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))     
           elif mtext=='當前模式' or mtext=='switcM':
             Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=ShowMode()))  
           elif isAISettingMode() == True:
               if ('現在數值' in mtext) or ('設定值' in mtext):
-                # https://beta.openai.com/docs/api-reference/completions/create
-                rtnstr=f"Model: \t{opaibotPara.model}\nTemperature: \t {opaibotPara.temperature}\nnMaxtokens: \t{opaibotPara.maxtoken}"
+                rtnstr=f"Model: \t{ChatCompletionsPara.model}\nnMaxtokens: \t{ChatCompletionsPara.maxtoken}"
                 Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))              
-              elif '設定模型' in mtext:
-                opaibotPara.model = mtext[len('設定模型')+1:]
-                rtnstr=f"opaibotPara.model: {opaibotPara.model}"
+              elif '更換模型' in mtext:
+                ChatCompletionsPara.model = mtext[len('更換模型')+1:]
+                rtnstr=f"opaibotPara.model: {ChatCompletionsPara.model}"
                 Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))     
-              elif ('設定溫度' in mtext) or ('設定情緒' in mtext):
-                opaibotPara.temperature = float(mtext[len('設定溫度')+1:])
-                rtnstr=f"opaibotPara.temperature: {opaibotPara.temperature}"
-                Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))                  
-              elif '設定回應長度' in mtext:
-                opaibotPara.maxtoken = int(mtext[len('設定回應長度')+1:])
-                rtnstr=f"opaibotPara.maxtoken: {opaibotPara.maxtoken}"
+              elif '回應長度' in mtext:
+                ChatCompletionsPara.maxtoken = int(mtext[len('回應長度')+1:])
+                rtnstr=f"opaibotPara.maxtoken: {ChatCompletionsPara.maxtoken}"
                 Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))               
           #openai TalkMode
-          elif isAITalkMode() == True:
-              if(len(mtext) == 3): #shortcut key words
-                if(mtext == 'mmk' or mtext == 'mkr'):
-                  set_DialogueBuffer()
-                  Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text='reg.'))                        
-                elif(mtext == 'clr'):
-                  clean_DialogueBuffer()
-                  Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text='[clean buffer]'))                      
-                elif(mtext == 'shw'):
-                  Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=get_DialogueBuffer()))                      
-              else:
-                clean_DialogueCatch()            
-                sendstr = get_DialogueBuffer()+mtext
-                response = openai.Completion.create(
-                  model=opaibotPara.model ,
-                  prompt=sendstr,
-                  max_tokens=opaibotPara.maxtoken, 
-                  temperature=opaibotPara.temperature,
-                  stop=opaibotPara.stop)                
-                rtnstr = response.choices[0].text.lstrip()                          
+          elif (isAITalkMode() and isMainUser(userId)):
+              # Reg tmp in order version.
+              # if(len(mtext) == 3): #shortcut key words
+              #   if(mtext == 'mmk' or mtext == 'mkr'):
+              #     set_DialogueBuffer()
+              #     Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text='reg.'))                        
+              #   elif(mtext == 'clr'):
+              #     clean_DialogueBuffer()
+              #     Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text='[clean buffer]'))                      
+              #   elif(mtext == 'shw'):
+              #     Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=get_DialogueBuffer()))                      
+              # else:
+              #   clean_DialogueCatch()            
+              #   sendstr = get_DialogueBuffer()+mtext
+                response = openai.ChatCompletion.create(
+                  model=ChatCompletionsPara.model,
+                  messages=[
+                    {"role": "system", "content": "You are a helpful assistant."},
+                    {"role": "user", "content": mtext}
+                  ],
+                  max_tokens=ChatCompletionsPara.maxtoken
+                )       
+                rtnstr = response['choices'][0]['message']['content']                    
                 set_DialogueCatch(mtext,rtnstr)
                 if(rtnstr!=None):
                   mongo.Insert_AIQuestion("Question:"+mtext+"\n Answer:"+rtnstr)
@@ -258,11 +242,11 @@ def handle_message(event):
           Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))         
         elif(mtext == '我的ID' or mtext=='我的id'):
             Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text='當前傳訊息帳號的id為:'+userId))                   
-        elif(mtext == '是否為主使用者'):
+        elif(mtext == '是否為管理者'):
             if(isMainUser(userId)):                         
-              rtnstr = f"是否為管理者:{isMainUser(userId)}\nuserid:[{userId}]\nenv:[{OPENAI_AdminID}]"
+              rtnstr = f"是否為管理者: {isMainUser(userId)}\nUser ID:[{userId}]\nACCESS ID:[{OPENAI_AdminID}]"
             else:
-              rtnstr = f"是否為管理者:{isMainUser(userId)}"
+              rtnstr = f"是否為管理者: {isMainUser(userId)}"
             Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))                   
         else:#各種開放功能
             if mtext[0:10] == 'testSpace=':
@@ -312,65 +296,6 @@ def handle_message(event):
                   Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response))                 
                 else:
                   Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=response.text))                 
-
-### DialogueBuffer
-def clean_DialogueBuffer():
-  """ 對話模式 - 清除緩存區
-  """
-  global DialogueBuffer
-  DialogueBuffer.clear()
-
-def set_DialogueBuffer():
-  """ 對話模式 - 將當前對話存入緩存 下次發話就會記錄對話過程
-  """
-  global Dialogue,DialogueBuffer
-  if(Dialogue['Question']!=''):
-    DialogueBuffer.append('Q:'+Dialogue['Question']+"\n******")
-  DialogueBuffer.append('A:'+Dialogue['Answer']+"\n******")  
-  
-def get_DialogueBuffer()->str:
-  """ 對話模式 - 取得緩存內容 
-
-  Returns:
-      str: 緩存內容
-  """
-  global DialogueBuffer
-  rtnstr=""
-  
-  if(len(DialogueBuffer) == 0):
-    return '[empty.]'
-  for d in DialogueBuffer:
-    rtnstr = rtnstr + d + '\n'
-    
-  return rtnstr
-
-### DialogueBuffer
-
-### DialogueCatch
-def set_DialogueCatch(question:str,answer:str):
-  """ 當openai回應token不足表達時使用
-
-  Args:
-      question (str): _description_
-      answer (str): _description_
-  """
-  global Dialogue
-  if(question!='繼續' and question.lower()!='continue'):
-    Dialogue['Question']=question
-  else:
-    Dialogue['Question']='' #空字串 不能用None
-  Dialogue['Answer']=answer
-  
-def get_DialogueCatch():
-  global Dialogue
-  return str(Dialogue['Question']) , str(Dialogue['Answer'])
-
-def clean_DialogueCatch():
-  global Dialogue
-  Dialogue['Question'] = None
-  Dialogue['Answer'] = None
-### DialogueCatch
-
       
 def SwitchSettingMode(userId):
   """ Switch mode
@@ -433,6 +358,71 @@ def ShowDoc():
   else:
     return str_doc
     
+# region ------ DialogueBuffer ------ 
+# change openai.Completion to chatCompletion will not need that.
+DialogueBuffer = deque()
+Dialogue = {
+    'Question': None,
+    'Answer': None,
+}
+
+def clean_DialogueBuffer():
+  """ 對話模式 - 清除緩存區
+  """
+  global DialogueBuffer
+  DialogueBuffer.clear()
+
+def set_DialogueBuffer():
+  """ 對話模式 - 將當前對話存入緩存 下次發話就會記錄對話過程
+  """
+  global Dialogue,DialogueBuffer
+  if(Dialogue['Question']!=''):
+    DialogueBuffer.append('Q:'+Dialogue['Question']+"\n******")
+  DialogueBuffer.append('A:'+Dialogue['Answer']+"\n******")  
+  
+def get_DialogueBuffer()->str:
+  """ 對話模式 - 取得緩存內容 
+
+  Returns:
+      str: 緩存內容
+  """
+  global DialogueBuffer
+  rtnstr=""
+  
+  if(len(DialogueBuffer) == 0):
+    return '[empty.]'
+  for d in DialogueBuffer:
+    rtnstr = rtnstr + d + '\n'
+    
+  return rtnstr
+
+### DialogueBuffer
+
+### DialogueCatch
+def set_DialogueCatch(question:str,answer:str):
+  """ 當openai回應token不足表達時使用
+
+  Args:
+      question (str): _description_
+      answer (str): _description_
+  """
+  global Dialogue
+  if(question!='繼續' and question.lower()!='continue'):
+    Dialogue['Question']=question
+  else:
+    Dialogue['Question']='' #空字串 不能用None
+  Dialogue['Answer']=answer
+  
+def get_DialogueCatch():
+  global Dialogue
+  return str(Dialogue['Question']) , str(Dialogue['Answer'])
+
+def clean_DialogueCatch():
+  global Dialogue
+  Dialogue['Question'] = None
+  Dialogue['Answer'] = None
+### DialogueCatch
+# endregion ------ DialogueBuffer ------
 
 print("[Finnish]..........Linebot Flask start!")
 if __name__ == '__main__':
