@@ -228,7 +228,7 @@ def handle_message(event):
                 response = openai.ChatCompletion.create(
                   model=ChatCompletionsPara.model,
                   messages=[
-                    {"role": "system", "content": "You are a helpful assistant."},
+                    {"role": "system", "content": "You are a helpful assistant. Respond in traditional Chinese when asked in Chinese."},
                     {"role": "user", "content": mtext}
                   ],
                   max_tokens=ChatCompletionsPara.maxtoken
