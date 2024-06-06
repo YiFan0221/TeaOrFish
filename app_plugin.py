@@ -202,7 +202,7 @@ def handle_message(event):
         if mtext=='切換' or mtext=='切換模式' or mtext=='SW' or mtext=='switch' :        
           rtnstr=f"{SwitchSettingMode(userId)}\n"
           if(isNormalMode() or (isEnableAITalk(userId) and (isAISettingMode() or isAITalkMode()))): #一般模式顯示 或者開放時於AI模式說明
-            rtnstr+={ShowDoc()}
+            rtnstr+=ShowDoc()
           Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))     
         elif mtext=='當前模式' or mtext=='switcM':
           Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=ShowMode())) 
