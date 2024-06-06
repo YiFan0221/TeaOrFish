@@ -69,6 +69,7 @@ print(f"ENV:OPENAI_AdminID     : {OPENAI_AdminID}")
 Linebot_Post_handle = LineBotApi(LINEBOT_POST_TOKEN)
 Linebot_Recv_handle = WebhookHandler(LINEBOT_RECV_TOKEN)
 Mode = 'Normal Mode'
+AllowNormalUser = False
 
 print("[Inital][Swagger]")
 app = Flask(__name__)
@@ -113,7 +114,22 @@ str_docAISetting = f"說明:可使用下列參數對AI進型設置\n\
 【 現在數值 】【設定值】顯示當前設定\n"
 
 
+def isEnableAITalk(userID):
+  if(isMainUser(userID)==True):
+    return True
+  else:
+    if(isAllowNormalUser()==True):
+      return True
+    else:
+      return False
 
+def isAllowNormalUser():
+  global AllowNormalUser
+  return AllowNormalUser
+
+def setAllowNormalUser(flg:bool):
+  global AllowNormalUser
+  AllowNormalUser=flg
 
 def isMainUser(userID):
   if(str(userID) == str(OPENAI_AdminID)):
@@ -178,21 +194,22 @@ def handle_message(event):
   if(MsgType=="text"):
       mtext=event.message.text
       print(f"['{message_id} ***收到文字***]：")      
-      if(isAITalkMode == True and not isMainUser(userId) ):
-        Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text='目前尚未開放中'))
+      # 當使用者正在使用chatGPT且不開放chatGPT時
+      if(isAITalkMode() == True and not isEnableAITalk(userId) ):
+        Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text='管理者關閉gpt聊天模式中'))
       else:     
-        #Only for main user
-        if isMainUser(userId) == True:
-          #Check command or not.
-          if mtext=='切換' or mtext=='切換模式' or mtext=='SW' or mtext=='switch' :        
-            rtnstr=f"{SwitchSettingMode(userId)}\n{ShowDoc()}"
-            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))     
-          elif mtext=='當前模式' or mtext=='switcM':
-            Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=ShowMode()))  
-          elif isAISettingMode() == True:
+        #Check command or not.
+        if mtext=='切換' or mtext=='切換模式' or mtext=='SW' or mtext=='switch' :        
+          rtnstr=f"{SwitchSettingMode(userId)}\n{ShowDoc()}"
+          Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))     
+        elif mtext=='當前模式' or mtext=='switcM':
+          Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=ShowMode())) 
+        # Check 
+        elif isEnableAITalk(userId):
+          if (isAISettingMode()):
               if ('現在數值' in mtext) or ('設定值' in mtext):
-                rtnstr=f"Model: \t{ChatCompletionsPara.model}\nnMaxtokens: \t{ChatCompletionsPara.maxtoken}"
-                Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))              
+                rtnstr=f"Model: \t{ChatCompletionsPara.model}\nnMaxtokens: \t{ChatCompletionsPara.maxtoken}\nAllowNormalUser: \t{isAllowNormalUser()}"
+                Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))
               elif '更換模型' in mtext:
                 ChatCompletionsPara.model = mtext[len('更換模型')+1:]
                 rtnstr=f"opaibotPara.model: {ChatCompletionsPara.model}"
@@ -200,22 +217,14 @@ def handle_message(event):
               elif '回應長度' in mtext:
                 ChatCompletionsPara.maxtoken = int(mtext[len('回應長度')+1:])
                 rtnstr=f"opaibotPara.maxtoken: {ChatCompletionsPara.maxtoken}"
-                Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))               
+                Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))
+              elif ('開放設定' in mtext) and isMainUser(userId):
+                setAllowNormalUser(not isAllowNormalUser())
+                rtnstr=f"AllowNormalUser: {isAllowNormalUser()}"
+                Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))
+          
           #openai TalkMode
-          elif (isAITalkMode() and isMainUser(userId)):
-              # Reg tmp in order version.
-              # if(len(mtext) == 3): #shortcut key words
-              #   if(mtext == 'mmk' or mtext == 'mkr'):
-              #     set_DialogueBuffer()
-              #     Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text='reg.'))                        
-              #   elif(mtext == 'clr'):
-              #     clean_DialogueBuffer()
-              #     Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text='[clean buffer]'))                      
-              #   elif(mtext == 'shw'):
-              #     Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=get_DialogueBuffer()))                      
-              # else:
-              #   clean_DialogueCatch()            
-              #   sendstr = get_DialogueBuffer()+mtext
+          elif (isAITalkMode()):
                 response = openai.ChatCompletion.create(
                   model=ChatCompletionsPara.model,
                   messages=[
@@ -229,11 +238,10 @@ def handle_message(event):
                 if(rtnstr!=None):
                   mongo.Insert_AIQuestion("Question:"+mtext+"\n Answer:"+rtnstr)
                 if(rtnstr==''):
-                  Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text='...'))                      
+                  Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text='...'))
                 else:
-                  Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))                      
-        #every user
-           
+                  Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))
+        #every user could use
         if mtext=='使用說明' or mtext=='--help' or mtext=='說明' :
           if(isMainUser(userId)==True):  
               rtnstr=ShowDoc(); 
@@ -308,7 +316,7 @@ def SwitchSettingMode(userId):
   """
   global Mode
   oldMode = Mode
-  if(isMainUser(userId) == True):
+  if(isEnableAITalk(userId) == True):
     if(Mode == 'AI Mode'):
       Mode = 'Normal Mode'
     elif(Mode == 'Normal Mode'):
@@ -319,7 +327,7 @@ def SwitchSettingMode(userId):
       Mode = 'Normal Mode'
     return f"模式:{oldMode} 更換為:{Mode}"
   else:
-    return 'Sorry, only main user could use this function.'
+    return 'Sorry, only main user could use this function now.'
 
 def isNormalMode():
   global Mode
