@@ -10,7 +10,6 @@ pymongo[srv] ==4.2.0
 #pytesseract==0.3.8
 #tesseract==0.1.3
 ###########圖文辨識###########
-###########OPENAI###########
 autopep8==1.6.0
 certifi==2021.10.8
 charset-normalizer==2.0.7
@@ -36,4 +35,3 @@ tqdm==4.62.3
 urllib3==1.26.7
 Werkzeug==2.0.2
 APScheduler==3.6.1
-###########OPENAI###########

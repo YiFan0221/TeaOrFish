@@ -99,19 +99,26 @@ print("[Inital][MongoDB]")
 mongo.Clientinit()
       
 boardlist=['TOP','八卦版','西施版','表特版']
-str_docAITalk = f"說明:對談模式。"
+str_docAITalk = f"說明:對談模式。\n\
+直接輸入對話內容或輸入【SW】切換模式離開\n"
+
 str_doc = f"說明:爬蟲相關功能\n\
+輸入【】內的指令執行功能 ex. >>八卦版\n\
+【SW】 爬蟲模式/切換設定模式/ChatGPT模式(不定時開放)\n\
 【八卦版】 最新十篇八卦版標題與連結\n\
 【西施版】 最新十篇西施版標題與連結\n\
 【表特版】 最新十篇表特版標題與連結\n\
 【TOP】   最新十篇股票版標題與連結\n\
 【我的ID】 回傳當前使用者UUID\n\
-【是否為管理者】回傳當前使用者是否為管理者"
+【是否為管理者】回傳當前使用者是否為管理者\n"
+
 
 str_docAISetting = f"說明:可使用下列參數對AI進型設置\n\
-【 更換模型:】指定使用的AI模型ex.gpt-3.5-turbo \n\
-【 回應長度: 】設定最多能回應的字節 int:0~2048\n\
-【 現在數值 】【設定值】顯示當前設定\n"
+輸入【】內的指令執行功能 ex. >>八卦版\n\
+【SW】 爬蟲模式/切換設定模式/ChatGPT模式(不定時開放)\n\
+【更換模型:】指定使用的AI模型ex.gpt-3.5-turbo \n\
+【回應長度:】設定最多能回應的字節 int:0~2048\n\
+【現在數值】【設定值】顯示當前設定\n"
 
 
 def isEnableAITalk(userID):
@@ -126,6 +133,9 @@ def isEnableAITalk(userID):
 def isAllowNormalUser():
   global AllowNormalUser
   return AllowNormalUser
+
+def showIsAllowNormalUser():
+  return "開放一般使用者使用GPT?:  "+str(isAllowNormalUser())
 
 def setAllowNormalUser(flg:bool):
   global AllowNormalUser
@@ -202,7 +212,7 @@ def handle_message(event):
         if mtext=='切換' or mtext=='切換模式' or mtext=='SW' or mtext=='switch' :        
           rtnstr=f"{SwitchSettingMode(userId)}\n"
           if(isNormalMode() or (isEnableAITalk(userId) and (isAISettingMode() or isAITalkMode()))): #一般模式顯示 或者開放時於AI模式說明
-            rtnstr+=ShowDoc()
+            rtnstr+=ShowDoc()+showIsAllowNormalUser()
           Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))     
         elif mtext=='當前模式' or mtext=='switcM':
           Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=ShowMode())) 
@@ -244,10 +254,10 @@ def handle_message(event):
                   Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))
         #every user could use
         if mtext=='使用說明' or mtext=='--help' or mtext=='說明' :
-          if(isMainUser(userId)==True):  
-              rtnstr=ShowDoc(); 
+          if(isEnableAITalk(userId)):  
+              rtnstr = ShowDoc()+showIsAllowNormalUser()
           else:
-              rtnstr=str_doc
+              rtnstr = str_doc
           Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text=rtnstr))         
         elif(mtext == '我的ID' or mtext=='我的id'):
             Linebot_Post_handle.reply_message(event.reply_token,TextSendMessage(text='當前傳訊息帳號的id為:'+userId))                   
