@@ -11,16 +11,17 @@ TeaOrFilsh
 
 # 大綱 <a name="top"></a>
 ### 1.---------架構方塊圖   [go](#architecture-1)
-### 2.---------操作筆記     [go](#architecture-1)
-### 2.1 -------SSL掛載             [go](#ssl掛載-21)
-### 2.2 -------編譯版本            [go](#編譯版本-22)
-### 2.3 -------DockerFilse   [go](#write-dockerfilse-23)
-### 2.4 -------python建立容器步驟  [go](#python建立容器步驟-24)
-### 2.5 -------docker build and launch [go](#docker-build-and-launch-25)
-### 2.6 -------docker container operation  [go](#docker-container-operation-26)
-### 2.7 -------push Docker Image to Docker Hub [go](#push-docker-image-to-docker-hub-27)
-### 2.8 -------docker-compose  [go](#docker-compose-28)
-### 2.9 -------docker-compose secretes [go](#docker-compose-secretes-29)
+### 2.---------操作筆記             [go](#操作筆記-2)
+### 2.1 -------ssl掛載             [go](#ssl掛載-21)
+### 2.2 -------venv啟用關閉        [go](#venv啟用關閉-22)
+### 2.3 -------編譯版本            [go](#編譯版本-23)
+### 2.4 -------DockerFilse   [go](#write-dockerfilse-24)
+### 2.5 -------python建立容器步驟  [go](#python建立容器步驟-25)
+### 2.6 -------docker build and launch [go](#docker-build-and-launch-26)
+### 2.7 -------docker container operation  [go](#docker-container-operation-27)
+### 2.8 -------push Docker Image to Docker Hub [go](#push-docker-image-to-docker-hub-28)
+### 2.9 -------docker-compose  [go](#docker-compose-29)
+### 2.10 ------docker-compose secretes [go](#docker-compose-secretes-210)
 
 ## Architecture 1
 ![](/ReadmePic/pic0.jpg)
@@ -53,7 +54,12 @@ sudo snap install core; sudo snap refresh core
 sudo snap install --classic certbot
 ``` 
 <br><br />
-# venv啟用關閉
+
+[Back Top](#top)
+
+<br><br />
+
+# venv啟用關閉 2.2
 創建
 ```
 python -m venv tutorial-env
@@ -68,11 +74,14 @@ source ./venv/bin/activate
 ```
 deactivate
 ```
-<br><br />
-[Back Top](#top)
+
 <br><br />
 
-## 編譯版本 2.2
+[Back Top](#top)
+
+<br><br />
+
+## 編譯版本 2.3
 ```
 cd /TeaOrFish/
 ./Release_Build/build_release_so.sh   
@@ -82,7 +91,7 @@ cp ../lib/TeaOrFish/ {target}
 [Back Top](#top)
 <br><br />
 
-## Write DockerFilse 2.3
+## Write DockerFilse 2.4
 產生 Docker Image 的時候應避免把太多服務包在一起，\
 一個 container 只運行一個 one process in one container\
 通常 Docker Image 約幾百MB左右。\
@@ -93,7 +102,7 @@ Container 中的 data 不會保存下來\
 [Back Top](#top)
 <br><br />
 
-## python建立容器步驟 2.4
+## python建立容器步驟 2.5
 - 根據使用的python 找對應版本的Docker Base 容器 [in this project](https://hub.docker.com/_/python)
 - 撰寫requirements.txt 把會用到的套件都寫進去, 可用此指令產出 requirements
 ``` 
@@ -109,7 +118,7 @@ pip freeze > requirements.txt
 [Back Top](#top)
 <br><br />
 
-## Docker build and launch 2.5
+## Docker build and launch 2.6
 -t 要建立出的image名稱  
 --no-cache 不產生cache
 ```
@@ -155,7 +164,7 @@ run 前綴詞說明\
 [Back Top](#top)
 <br><br />
 
-## Docker container operation 2.6
+## Docker container operation 2.7
  啟用容器
 ```
 sudo docker start teaorfish
@@ -186,7 +195,7 @@ sudo docker rmi <Image ID>
 [Back Top](#top)
 <br><br />
  
-## Push Docker Image to Docker Hub 2.7
+## Push Docker Image to Docker Hub 2.8
 [參考ref] https://ithelp.ithome.com.tw/articles/10192824
 
 Log in
@@ -207,7 +216,7 @@ sudo docker pull gary80221/teaorfish:\<version>
 [Back Top](#top)
 <br><br />
 
-## Docker-compose 2.8
+## Docker-compose 2.9
 
 建立網路nat
 ```
@@ -247,7 +256,7 @@ docker-compose up -d --scale teaorfish=3
 [Back Top](#top)
 <br><br />
 
-## docker-compose secretes 2.9
+## docker-compose secretes 2.10
 在最上層宣告並引入檔案到secretes
 ```
 secrets: 
@@ -271,7 +280,7 @@ secrets:
 [Back Top](#top)
 <br><br />
 
-# Other ref source. 3
+# Other ref source. 
 [[小抄] Docker 基本命令 (實用)](https://yingclin.github.io/2018/docker-basic.html)\
 [一般DOCKER FILE指令教學](https://ithelp.ithome.com.tw/articles/10191016)\
 [使用 DockerSlim 優化和減小 Docker 容器鏡像的大小(link內的ARM不能用)](https://grayguide.net/zh-hant/%E4%BD%BF%E7%94%A8-dockerslim-%E5%84%AA%E5%8C%96%E5%92%8C%E6%B8%9B%E5%B0%8F-docker-%E5%AE%B9%E5%99%A8%E9%8F%A1%E5%83%8F%E7%9A%84%E5%A4%A7%E5%B0%8F)\
