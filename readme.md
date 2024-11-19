@@ -108,7 +108,10 @@ Container 中的 data 不會保存下來\
 ``` 
 pip freeze > requirements.txt 
 ```
-
+- 使用requirements安裝則可以使用
+```
+pip install -r requirements.txt
+```
 - 撰寫Docker File
 - FROM python:3.9 改成 FROM python:3.9-slim 可以把沒用到的給清除
 - 先處理套件(requirements)在處理Copy SourceCode
