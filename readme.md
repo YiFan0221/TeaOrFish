@@ -1,7 +1,7 @@
 
 TeaOrFilsh
 ===================
-作為分散式架構架構中的主服務, 
+作為架構中的主服務, 
 
 主要展現backend, Linebot/OpenAI api的串接, SSL的掛載, forward request, build and delivery Docker container
 
